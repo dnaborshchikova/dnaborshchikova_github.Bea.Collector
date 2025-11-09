@@ -1,0 +1,31 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.cache
+*.log
+
+# Build Folders
+bin/
+obj/
+out/
+
+# Rider / ReSharper
+.idea/
+*.sln.DotSettings.user
+
+# DotNet
+*.dbmdl
+*.pdb
+*.dll
+*.exe
+*.nuget
+
+# ASP.NET
+*.vspscc
+*.vssscc
+
+# Others
+*.ncrunch*
+*.resharper*
+_ReSharper*/
