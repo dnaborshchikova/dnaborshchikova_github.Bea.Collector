@@ -13,9 +13,6 @@ namespace dnaborshchikova_github.Bea.Collector.CollertorService.Models
         public Guid UserId { get; set; }
         public string EventType { get; set; } // "bill_payed" или "bill_canceled"
         public decimal Amount { get; set; }
-        public string Number { get; set; }
-
-        public Guid? BuyerId { get; set; }
-        public decimal? CancelAmount { get; set; }
+        public string Number { get; set; }        
     }
 }
