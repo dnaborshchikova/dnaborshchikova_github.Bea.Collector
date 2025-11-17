@@ -3,9 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36327.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.CollertorService", "dnaborshchikova_github.Bea.Collector\dnaborshchikova_github.Bea.Collector.CollertorService.csproj", "{AC5416B8-F8BB-43D7-998E-566AB20FE6F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.App", "dnaborshchikova_github.Bea.Collector\dnaborshchikova_github.Bea.Collector.App.csproj", "{AC5416B8-F8BB-43D7-998E-566AB20FE6F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.Generator", "dnaborshchikova_github.Bea.Collector.Generator\dnaborshchikova_github.Bea.Collector.Generator.csproj", "{BECA5676-BBEB-4B68-8703-64356D8CCF3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Generator", "dnaborshchikova_github.Bea.Collector.Generator\dnaborshchikova_github.Bea.Generator.csproj", "{BECA5676-BBEB-4B68-8703-64356D8CCF3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.Parser", "dnaborshchikova_github.Bea.Collector.Parser\dnaborshchikova_github.Bea.Collector.Parser.csproj", "{9509401A-4F64-4FD6-9DA3-3B96CDBC53AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.Sender", "dnaborshchikova_github.Bea.Collector.Sender\dnaborshchikova_github.Bea.Collector.Sender.csproj", "{A08FDA50-D064-467A-B995-2A539810A0CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.Processor", "dnaborshchikova_github.Bea.Collector.Processor\dnaborshchikova_github.Bea.Collector.Processor.csproj", "{784F0ED5-D0AB-4A50-9D26-99EFB8F06925}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.Core", "dnaborshchikova_github.Bea.Collector.Core\dnaborshchikova_github.Bea.Collector.Core.csproj", "{3D3CA43F-25C2-48A5-A969-DE6AE4E1388F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +29,22 @@ Global
 		{BECA5676-BBEB-4B68-8703-64356D8CCF3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BECA5676-BBEB-4B68-8703-64356D8CCF3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BECA5676-BBEB-4B68-8703-64356D8CCF3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9509401A-4F64-4FD6-9DA3-3B96CDBC53AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9509401A-4F64-4FD6-9DA3-3B96CDBC53AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9509401A-4F64-4FD6-9DA3-3B96CDBC53AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9509401A-4F64-4FD6-9DA3-3B96CDBC53AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A08FDA50-D064-467A-B995-2A539810A0CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A08FDA50-D064-467A-B995-2A539810A0CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A08FDA50-D064-467A-B995-2A539810A0CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A08FDA50-D064-467A-B995-2A539810A0CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{784F0ED5-D0AB-4A50-9D26-99EFB8F06925}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{784F0ED5-D0AB-4A50-9D26-99EFB8F06925}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{784F0ED5-D0AB-4A50-9D26-99EFB8F06925}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{784F0ED5-D0AB-4A50-9D26-99EFB8F06925}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D3CA43F-25C2-48A5-A969-DE6AE4E1388F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D3CA43F-25C2-48A5-A969-DE6AE4E1388F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D3CA43F-25C2-48A5-A969-DE6AE4E1388F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D3CA43F-25C2-48A5-A969-DE6AE4E1388F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

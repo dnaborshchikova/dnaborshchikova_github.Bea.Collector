@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace dnaborshchikova_github.Bea.Collector.CollertorService.Interfaces
+namespace dnaborshchikova_github.Bea.Collector.Core.Interfaces
 {
-    public interface IEventSender
+    public interface IProcessor
     {
     }
 }
