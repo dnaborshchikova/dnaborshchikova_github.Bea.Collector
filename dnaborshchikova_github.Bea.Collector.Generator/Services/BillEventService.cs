@@ -1,11 +1,12 @@
 ﻿using Bogus;
 using dnaborshchikova_github.Bea.Collector.Generator.Models;
+using dnaborshchikova_github.Bea.Generator.Interfaces;
 
 namespace dnaborshchikova_github.Bea.Generator.Services
 {
-    public static class BillEventService
+    public class BillEventService : IBillEventService
     {
-        public static List<BillEventFileRecord> GetBillEvents(int paidBillEventRecordCount
+        public List<BillEventFileRecord> GetBillEvents(int paidBillEventRecordCount
             , int cancelledBillEventRecordCount)
         {
             var date = DateTime.Today;
@@ -18,7 +19,7 @@ namespace dnaborshchikova_github.Bea.Generator.Services
                 .RuleFor(e => e.CancelAmount, (f, e) => null)
                 .RuleFor(e => e.BillNumber, (f, e) => (100000 + f.IndexFaker).ToString())
                 .RuleFor(e => e.Id, f => f.Random.Guid())
-                .RuleFor(e => e.BuyerId, f => f.Random.Bool(0.5f) ? f.Random.Guid() : (Guid?)null);
+                .RuleFor(e => e.BuyerId, f => f.Random.Guid());
 
             var canceledFaker = new Faker<BillEventFileRecord>("ru")
                 .RuleFor(e => e.OperationDateTime, f => f.Date.Between(date.AddDays(-7), date.AddDays(7)))
