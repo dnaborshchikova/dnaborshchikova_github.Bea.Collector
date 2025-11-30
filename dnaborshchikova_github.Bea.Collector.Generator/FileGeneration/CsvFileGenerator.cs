@@ -13,6 +13,7 @@ namespace dnaborshchikova_github.Bea.Generator.FileGeneration
 
             using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
             {
+                writer.WriteLine("Id,UserId,BuyerId,BillNumber,EventType,OperationDateTime,Amount,CancelAmount");
                 foreach (var bill in billEvents)
                 {
 
