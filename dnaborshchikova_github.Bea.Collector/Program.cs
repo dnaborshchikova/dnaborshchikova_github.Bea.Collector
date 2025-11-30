@@ -1,5 +1,4 @@
-﻿using dnaborshchikova_github.Bea.Generator.Interfaces;
-using dnaborshchikova_github.Bea.Generator.Services;
+﻿using dnaborshchikova_github.Bea.Generator;
 using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 
@@ -20,12 +19,8 @@ if (isRunAsProcess)
 var fileFormat = config["FileFormat"];
 var paidBillEventCount = int.Parse(config["PaidBillEventCount"]);
 var cancelledBillEventCount = int.Parse(config["CancelledBillEventCount"]);
-IGenerateService generateService = fileFormat switch
-{
-    "csv" => new CsvGenerateService(),
-    "xml" => new XmlGenerateService(),
-    _ => new CsvGenerateService()
-};
 
-generateService.GenerateFile(paidBillEventCount, cancelledBillEventCount);
+var runner = new AppRunner();
+runner.Generate(fileFormat, paidBillEventCount, cancelledBillEventCount);
+
 Console.ReadLine();
