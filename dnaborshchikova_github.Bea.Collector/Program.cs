@@ -6,7 +6,8 @@ var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
 
-var isRunAsProcess = bool.Parse(config["RunAsProcess"]);
+if (!bool.TryParse(config["RunAsProcess"], out var isRunAsProcess))
+    throw new Exception($"Конфигурационный файл не настроен.\nНе задан параметр RunAsProcess.");
 
 if (isRunAsProcess)
 {
@@ -16,9 +17,20 @@ if (isRunAsProcess)
     return;
 }
 
+
+var errors = new List<string>();
+if (!int.TryParse(config["PaidBillEventCount"], out var paidBillEventCount))
+    errors.Add("PaidBillEventCount");
+
+if (!int.TryParse(config["CancelledBillEventCount"], out var cancelledBillEventCount))
+    errors.Add("CancelledBillEventCount");
+
 var fileFormat = config["FileFormat"];
-var paidBillEventCount = int.Parse(config["PaidBillEventCount"]);
-var cancelledBillEventCount = int.Parse(config["CancelledBillEventCount"]);
+if (string.IsNullOrWhiteSpace(fileFormat))
+    errors.Add("FileFormat");
+
+if (errors.Count > 0)
+    throw new Exception($"Конфигурационный файл не настроен.\nНе заданы параметры:\n {string.Join("\n", errors)}");
 
 var runner = new AppRunner();
 runner.Generate(fileFormat, paidBillEventCount, cancelledBillEventCount);
