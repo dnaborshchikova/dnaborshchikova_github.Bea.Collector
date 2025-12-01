@@ -12,7 +12,7 @@ namespace dnaborshchikova_github.Bea.Generator.DataGeneration
                 .RuleFor(x => x.OperationDateTime, f => f.Date.Recent(5))
                 .RuleFor(x => x.UserId, f => Guid.NewGuid())
                 .RuleFor(x => x.EventType, f => "bill_payed")
-                .RuleFor(x => x.Amount, f => f.Random.Decimal(100, 5000))
+                .RuleFor(x => x.Amount, f => Math.Round(f.Random.Decimal(100, 5000), 2))
                 .RuleFor(x => x.Number, f => f.Random.Int(100000, 999999).ToString())
                 .RuleFor(x => x.BuyerId, f => Guid.NewGuid());
 
@@ -22,7 +22,7 @@ namespace dnaborshchikova_github.Bea.Generator.DataGeneration
                 .RuleFor(x => x.UserId, f => Guid.NewGuid())
                 .RuleFor(x => x.EventType, f => "bill_canceled")
                 .RuleFor(x => x.Amount, f => f.Random.Decimal(100, 5000))
-                .RuleFor(x => x.CancelAmount, (f, b) => f.Random.Decimal(10, b.Amount))
+                .RuleFor(x => x.CancelAmount, (f, b) => Math.Round(f.Random.Decimal(10, b.Amount), 2))
                 .RuleFor(x => x.Number, f => f.Random.Int(100000, 999999).ToString());
 
             var paidBills = paidBillFaker.Generate(paidBillEventRecordCount);
