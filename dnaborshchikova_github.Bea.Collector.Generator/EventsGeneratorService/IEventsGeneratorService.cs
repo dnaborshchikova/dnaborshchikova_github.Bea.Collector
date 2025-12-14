@@ -2,7 +2,6 @@
 {
     public interface IEventsGeneratorService
     {
-        public void GenerateEvents(string fileFormat, int paidBillEventRecordCount
-             , int cancelledBillEventRecordCount);
+        public void GenerateEvents();
     }
 }

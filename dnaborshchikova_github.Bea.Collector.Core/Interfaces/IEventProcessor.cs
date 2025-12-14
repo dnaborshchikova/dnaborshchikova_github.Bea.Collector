@@ -8,6 +8,6 @@ namespace dnaborshchikova_github.Bea.Collector.Core.Interfaces
 {
     public interface IEventProcessor
     {
-        public void Process(string filePath, int threadCount, string processType);
+        public void Process();
     }
 }

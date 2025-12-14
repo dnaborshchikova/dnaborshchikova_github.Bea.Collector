@@ -32,7 +32,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
             }
         }
 
-        public void Send(List<BillEvent> billEvents)
+        private void Send(List<BillEvent> billEvents)
         {
             foreach (var billEvent in billEvents)
             {

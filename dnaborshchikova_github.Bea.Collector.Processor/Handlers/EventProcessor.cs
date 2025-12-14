@@ -6,28 +6,31 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 {
     public class EventProcessor : IEventProcessor
     {
+        private readonly AppSettings _appSettings;
         private readonly Func<string, IProcessor> _processor;
         private readonly IParcer _parcer;
 
-        public EventProcessor(Func<string, IProcessor> processor, IParcer parcer)
+        public EventProcessor(Func<string, IProcessor> processor, IParcer parcer, AppSettings appSettings)
         {
             _parcer = parcer;
             _processor = processor;
+            _appSettings = appSettings;
         }
 
-        public void Process(string filePath, int threadCount, string processType)
+        public void Process()
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             Console.WriteLine($"Начата обработка файла.");
 
-            var billEvents = _parcer.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();
-            var ranges = GenerateParts(billEvents, threadCount);
+            var billEvents = _parcer.Parse(_appSettings.FilePath).OrderBy(e => e.OperationDateTime).ToList();
+            var ranges = GenerateParts(billEvents, _appSettings.ThreadCount);
 
-            var processor = _processor(processType);
+            var processor = _processor(_appSettings.ProcessType);
             processor.Process(ranges);
             stopwatch.Stop();
-            Console.WriteLine($"Завершена обработка файла.\nКоличество потоков {threadCount}, время обработки {stopwatch.ElapsedMilliseconds} мс.");
+            Console.WriteLine($"Завершена обработка файла.\n" +
+                $"Количество потоков {_appSettings.ThreadCount}, время обработки {stopwatch.ElapsedMilliseconds} мс.");
         }
 
         private List<List<BillEvent>> GenerateParts(List<BillEvent> billEvents, int threadCount)

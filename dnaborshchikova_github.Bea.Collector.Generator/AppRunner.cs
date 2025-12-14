@@ -1,4 +1,5 @@
-﻿using dnaborshchikova_github.Bea.Generator.DataGeneration;
+﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
+using dnaborshchikova_github.Bea.Generator.DataGeneration;
 using dnaborshchikova_github.Bea.Generator.EventsGeneratorService;
 using dnaborshchikova_github.Bea.Generator.FileGeneration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,11 +11,12 @@ namespace dnaborshchikova_github.Bea.Generator
     {
         private readonly IHost _host;
 
-        public AppRunner()
+        public AppRunner(AppSettings appSettings)
         {
             _host = Host.CreateDefaultBuilder()
                      .ConfigureServices(services =>
                      {
+                         services.AddSingleton(appSettings);
                          services.AddScoped<CsvFileGenerator>();
                          services.AddScoped<XmlFileGenerator>();
                          services.AddScoped<Func<string, IFileGenerator>>(provider => key =>
@@ -32,11 +34,11 @@ namespace dnaborshchikova_github.Bea.Generator
                      .Build();
         }
 
-        public void Generate(string fileFormat, int paidBillEventCount, int cancelledBillEventCount)
+        public void Generate()
         {
             using var scope = _host.Services.CreateScope();
             var eventsGeneratorService = scope.ServiceProvider.GetRequiredService<IEventsGeneratorService>();
-            eventsGeneratorService.GenerateEvents(fileFormat, paidBillEventCount, cancelledBillEventCount);
+            eventsGeneratorService.GenerateEvents();
         }
     }
 }
