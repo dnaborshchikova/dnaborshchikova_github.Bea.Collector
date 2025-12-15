@@ -8,7 +8,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
     {
         public void Send(BillEvent billEvent)
         {
-            Thread.Sleep(1000);
+            Thread.Sleep(20);
 
             var billData = billEvent switch
             {

@@ -42,16 +42,23 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
             var step = TimeSpan.FromTicks(total.Ticks / threadCount);
 
             var dateRanges = new List<DateTime>();
-            for (int i = 0; i <= threadCount; i++)
-                dateRanges.Add(minDate + TimeSpan.FromTicks(step.Ticks * i));
+            if (threadCount != 1)
+            {
+                dateRanges = new List<DateTime>();
+                for (int i = 0; i <= threadCount; i++)
+                    dateRanges.Add(minDate + TimeSpan.FromTicks(step.Ticks * i));
+            }
+            else
+            {
+                dateRanges = new List<DateTime> { minDate };
+            }
 
             var eventRanges = new List<List<BillEvent>>();
-
             for (int i = 0; i < dateRanges.Count; i++)
             {
                 var nextRangeIndex = i + 1;
                 var eventRange = new List<BillEvent>();
-                if (nextRangeIndex != dateRanges.Count)
+                if (nextRangeIndex < dateRanges.Count)
                 {
                     eventRange = billEvents.Where(e => e.OperationDateTime.Date >= dateRanges[i]
                                             && e.OperationDateTime.Date < dateRanges[nextRangeIndex]).ToList();
