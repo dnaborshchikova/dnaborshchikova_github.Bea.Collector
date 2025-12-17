@@ -1,4 +1,5 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Generator;
 using Microsoft.Extensions.Configuration;
 
@@ -26,8 +27,7 @@ if (string.IsNullOrWhiteSpace(fileFormat))
 if (errors.Count > 0)
     throw new Exception($"Конфигурационный файл не настроен.\nНе заданы параметры:\n {string.Join("\n", errors)}");
 
-var appSettings = new AppSettings(false, false, string.Empty,
-    fileFormat, paidBillEventCount, cancelledBillEventCount, 0, string.Empty);
+var appSettings = new GeneratorSettings(fileFormat, paidBillEventCount, cancelledBillEventCount);
 
 var runner = new AppRunner(appSettings);
 runner.Generate();

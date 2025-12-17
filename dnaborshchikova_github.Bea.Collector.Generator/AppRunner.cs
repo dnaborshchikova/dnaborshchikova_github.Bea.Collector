@@ -1,4 +1,4 @@
-﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
+﻿using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Generator.DataGeneration;
 using dnaborshchikova_github.Bea.Generator.EventsGeneratorService;
 using dnaborshchikova_github.Bea.Generator.FileGeneration;
@@ -11,12 +11,12 @@ namespace dnaborshchikova_github.Bea.Generator
     {
         private readonly IHost _host;
 
-        public AppRunner(AppSettings appSettings)
+        public AppRunner(GeneratorSettings generatorSettings)
         {
             _host = Host.CreateDefaultBuilder()
                      .ConfigureServices(services =>
                      {
-                         services.AddSingleton(appSettings);
+                         services.AddSingleton(generatorSettings);
                          services.AddScoped<CsvFileGenerator>();
                          services.AddScoped<XmlFileGenerator>();
                          services.AddScoped<Func<string, IFileGenerator>>(provider => key =>

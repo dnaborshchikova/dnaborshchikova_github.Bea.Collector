@@ -1,16 +1,17 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using System.Diagnostics;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 {
-    public class EventProcessor : IEventProcessor
+    public class EventProcessorService : IEventProcessor
     {
         private readonly AppSettings _appSettings;
         private readonly Func<string, IProcessor> _processor;
         private readonly IParcer _parcer;
 
-        public EventProcessor(Func<string, IProcessor> processor, IParcer parcer, AppSettings appSettings)
+        public EventProcessorService(Func<string, IProcessor> processor, IParcer parcer, AppSettings appSettings)
         {
             _parcer = parcer;
             _processor = processor;
@@ -23,36 +24,19 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
             stopwatch.Start();
             Console.WriteLine($"Начата обработка файла.");
 
-            var billEvents = _parcer.Parse(_appSettings.FilePath).OrderBy(e => e.OperationDateTime).ToList();
-            var ranges = GenerateParts(billEvents, _appSettings.ThreadCount);
+            var billEvents = _parcer.Parse(_appSettings.ProcessingSettings.FilePath).OrderBy(e => e.OperationDateTime).ToList();
+            var ranges = GenerateParts(billEvents, _appSettings.ProcessingSettings.ThreadCount);
 
-            var processor = _processor(_appSettings.ProcessType);
+            var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
             processor.Process(ranges);
             stopwatch.Stop();
             Console.WriteLine($"Завершена обработка файла.\n" +
-                $"Количество потоков {_appSettings.ThreadCount}, время обработки {stopwatch.ElapsedMilliseconds} мс.");
+                $"Количество потоков {_appSettings.ProcessingSettings.ThreadCount}, время обработки {stopwatch.ElapsedMilliseconds} мс.");
         }
 
         private List<List<BillEvent>> GenerateParts(List<BillEvent> billEvents, int threadCount)
         {
-            var dates = billEvents.Select(e => e.OperationDateTime.Date).ToList();
-            var minDate = dates.Min(e => e.Date);
-            var maxDate = dates.Max(e => e.Date);
-            var total = maxDate - minDate;
-            var step = TimeSpan.FromTicks(total.Ticks / threadCount);
-
-            var dateRanges = new List<DateTime>();
-            if (threadCount != 1)
-            {
-                dateRanges = new List<DateTime>();
-                for (int i = 0; i <= threadCount; i++)
-                    dateRanges.Add(minDate + TimeSpan.FromTicks(step.Ticks * i));
-            }
-            else
-            {
-                dateRanges = new List<DateTime> { minDate };
-            }
-
+            var dateRanges = GetDataRanges(billEvents, threadCount);
             var eventRanges = new List<List<BillEvent>>();
             for (int i = 0; i < dateRanges.Count; i++)
             {
@@ -72,6 +56,29 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
             }
 
             return eventRanges;
+        }
+
+        private List<DateTime> GetDataRanges(List<BillEvent> billEvents, int threadCount)
+        {
+            var dates = billEvents.Select(e => e.OperationDateTime.Date).ToList();
+            var minDate = dates.Min(e => e.Date);
+            var maxDate = dates.Max(e => e.Date);
+            var total = maxDate - minDate;
+            var step = TimeSpan.FromTicks(total.Ticks / threadCount);
+            var dateRanges = new List<DateTime>();
+
+            if (threadCount != 1)
+            {
+                dateRanges = new List<DateTime>();
+                for (int i = 0; i <= threadCount; i++)
+                    dateRanges.Add(minDate + TimeSpan.FromTicks(step.Ticks * i));
+            }
+            else
+            {
+                dateRanges = new List<DateTime> { minDate };
+            }
+
+            return dateRanges;
         }
     }
 }

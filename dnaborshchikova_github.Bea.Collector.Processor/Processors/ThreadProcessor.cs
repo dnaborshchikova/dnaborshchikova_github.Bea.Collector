@@ -1,7 +1,7 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models;
 
-namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
+namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 {
     public class ThreadProcessor : IProcessor
     {
