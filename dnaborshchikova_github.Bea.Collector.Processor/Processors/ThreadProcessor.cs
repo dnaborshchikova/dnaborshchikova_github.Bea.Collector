@@ -1,15 +1,18 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 {
     public class ThreadProcessor : IProcessor
     {
         private readonly IEventSender _eventSender;
+        private readonly ILogger<ThreadProcessor> _logger;
 
-        public ThreadProcessor(IEventSender eventSender)
+        public ThreadProcessor(IEventSender eventSender, ILogger<ThreadProcessor> logger)
         {
             _eventSender = eventSender;
+            _logger = logger;
         }
 
         public void Process(List<List<BillEvent>> ranges)
@@ -20,11 +23,11 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                 {
                     try
                     {
-                        Send(range);
+                        _eventSender.Send(range);
                     }
                     catch (Exception ex)
                     {
-                        //Log.Error(ex, "Ошибка в потоке обработки диапазона");
+                        _logger.LogInformation(ex, "Ошибка в потоке обработки диапазона.");
                     }
                 });
 

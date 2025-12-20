@@ -8,6 +8,8 @@ using dnaborshchikova_github.Bea.Generator;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Core;
 
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -33,6 +35,10 @@ else if (appSettings.ProcessingSettings.GenerateFile)
 
 #endregion
 
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(config)
+    .CreateLogger();
+
 var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
     {
         services.AddSingleton(appSettings);
@@ -40,7 +46,8 @@ var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
         services.AddScoped<TaskProcessor>();
         services.AddScoped<IParcer, CsvParser>();
         services.AddScoped<IEventProcessor, EventProcessorService>();
-        services.AddScoped<IEventSender, BillEventFileMQSender>();
+        services.AddScoped<IEventSender, MessageQueueSender>();
+        services.AddScoped<ILogger, Logger>();
         services.AddScoped<Func<string, IProcessor>>(provider => key =>
         {
             return key switch
@@ -49,7 +56,10 @@ var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
                 "Task" => provider.GetRequiredService<TaskProcessor>()
             };
         });
+
+       
     })
+    .UseSerilog()
     .Build();
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();

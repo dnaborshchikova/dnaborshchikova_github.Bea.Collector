@@ -3,7 +3,7 @@ using dnaborshchikova_github.Bea.Collector.Core.Models;
 
 namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 {
-    public class BillEventFileDatabaseSender : IEventSender
+    public class DataBaseSender : IEventSender
     {
         public void Send(BillEvent billEvent)
         {
