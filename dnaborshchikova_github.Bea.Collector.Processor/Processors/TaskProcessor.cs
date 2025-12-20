@@ -5,7 +5,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 {
     public class TaskProcessor : IProcessor
     {
-        public void Process(List<List<BillEvent>> ranges)
+        public void Process(List<EventProcessRange> ranges)
         {
             throw new NotImplementedException();
         }

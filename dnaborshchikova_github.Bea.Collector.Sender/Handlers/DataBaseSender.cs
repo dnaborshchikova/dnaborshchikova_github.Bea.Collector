@@ -5,7 +5,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 {
     public class DataBaseSender : IEventSender
     {
-        public void Send(BillEvent billEvent)
+        public void Send(EventProcessRange range)
         {
             throw new NotImplementedException();
         }

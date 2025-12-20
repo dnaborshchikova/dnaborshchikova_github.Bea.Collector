@@ -4,6 +4,6 @@ namespace dnaborshchikova_github.Bea.Collector.Core.Interfaces
 {
     public interface IEventSender
     {
-        public void Send(List<BillEvent> billEvents);
+        public void Send(EventProcessRange range);
     }
 }

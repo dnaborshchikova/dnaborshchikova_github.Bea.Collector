@@ -15,8 +15,10 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             _logger = logger;
         }
 
-        public void Process(List<List<BillEvent>> ranges)
+        public void Process(List<EventProcessRange> ranges)
         {
+            using var countdown = new CountdownEvent(ranges.Count);
+
             foreach (var range in ranges)
             {
                 var thread = new Thread(() =>
@@ -29,34 +31,17 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                     {
                         _logger.LogInformation(ex, "Ошибка в потоке обработки диапазона.");
                     }
+                    finally
+                    {
+                        countdown.Signal();
+                    }
                 });
 
                 thread.Start();
+                
             }
-        }
 
-        private void Send(List<BillEvent> billEvents)
-        {
-            foreach (var billEvent in billEvents)
-            {
-                const int maxRetries = 3;
-
-                for (var attempt = 1; attempt <= maxRetries; attempt++)
-                {
-                    try
-                    {
-                        _eventSender.Send(billEvent);
-                        return;
-                    }
-                    catch
-                    {
-                        if (attempt != maxRetries)
-                        {
-                            Thread.Sleep(1000 * attempt);
-                        }
-                    }
-                }
-            }
+            countdown.Wait();
         }
     }
 }
