@@ -8,6 +8,9 @@ namespace dnaborshchikova_github.Bea.Collector.Parser.Handlers
     {
         public List<BillEvent> Parse(string filePath)
         {
+            if (!File.Exists(filePath))
+                throw new InvalidOperationException($"Не найден файл по пути {filePath}");
+
             var cancelledBills = new List<CancelledBillEvent>();
             var paidBills = new List<PaidBillEvent>();
 

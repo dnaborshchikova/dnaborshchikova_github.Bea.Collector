@@ -56,8 +56,6 @@ var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
                 "Task" => provider.GetRequiredService<TaskProcessor>()
             };
         });
-
-       
     })
     .UseSerilog()
     .Build();

@@ -10,8 +10,8 @@
 
         public void Validate()
         {
-            if (!File.Exists(FilePath))
-                throw new InvalidOperationException($"Не найден файл по пути {FilePath}");
+            if (string.IsNullOrEmpty(FilePath))
+                throw new InvalidOperationException("Не указан путь к файлу");
 
             if (ThreadCount <= 0 )
                 throw new InvalidOperationException($"Не указано количество потоков.");

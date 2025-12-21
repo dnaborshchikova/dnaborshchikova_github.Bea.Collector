@@ -3,7 +3,6 @@ using dnaborshchikova_github.Bea.Collector.Core.Models;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using System.Threading;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 {
@@ -27,22 +26,24 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
         {
             Console.WriteLine($"Начата обработка файла.");
             _logger.LogInformation($"Processing start {DateTime.Now}");
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             var filePath = _appSettings.ProcessingSettings.FilePath;
             _logger.LogInformation($"Parse file start. File path: {filePath}");
-            var billEvents = _parcer.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();
+
+            var billEvents = _parcer.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();//
             var ranges = GenerateParts(billEvents, _appSettings.ProcessingSettings.ThreadCount);
-                        
-            var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
+            var processor = _processor(_appSettings.ProcessingSettings.ProcessType); //
             processor.Process(ranges);
+
             stopwatch.Stop();
-            Console.WriteLine($"Завершена обработка файла.");
             _logger.LogInformation($"Processing end {DateTime.Now}. Total processing time: {stopwatch.ElapsedMilliseconds} ms.");
+            Console.WriteLine($"Завершена обработка файла.");
         }
 
-        private List<EventProcessRange> GenerateParts(List<BillEvent> billEvents, int threadCount)
+        public List<EventProcessRange> GenerateParts(List<BillEvent> billEvents, int threadCount)
         {
             _logger.LogInformation($"Fill ranges start.");
 
