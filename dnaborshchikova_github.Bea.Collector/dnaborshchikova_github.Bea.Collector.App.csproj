@@ -8,8 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Core\dnaborshchikova_github.Bea.Collector.Core.csproj" />
     <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Generator\dnaborshchikova_github.Bea.Generator.csproj" />
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Parser\dnaborshchikova_github.Bea.Collector.Parser.csproj" />
     <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Processor\dnaborshchikova_github.Bea.Collector.Processor.csproj" />
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Sender\dnaborshchikova_github.Bea.Collector.Sender.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -7,22 +7,11 @@ var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
 
-var errors = new List<string>();
-if (!int.TryParse(config["PaidBillEventCount"], out var paidBillEventCount))
-    errors.Add("PaidBillEventCount");
+var settingsService = new GeneratorSettingsService(config);
+var settings = settingsService.GetSettings();
 
-if (!int.TryParse(config["CancelledBillEventCount"], out var cancelledBillEventCount))
-    errors.Add("CancelledBillEventCount");
-
-var fileFormat = config["FileFormat"];
-if (string.IsNullOrWhiteSpace(fileFormat))
-    errors.Add("FileFormat");
-
-if (errors.Count > 0)
-    throw new Exception($"Конфигурационный файл не настроен.\nНе заданы параметры:\n {string.Join("\n", errors)}");
-
-var runner = new AppRunner();
-runner.Generate(fileFormat, paidBillEventCount, cancelledBillEventCount);
+var runner = new AppRunner(settings);
+runner.Generate();
 
 Console.WriteLine("Генерация завершена.");
 Console.ReadLine();
