@@ -33,6 +33,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
                     dbContext.SendEvents.Add(sendEvent);                    
                 }
                 dbContext.SaveChanges();
+                Console.WriteLine(dbContext.SendEvents.Count());
             }
         }
     }

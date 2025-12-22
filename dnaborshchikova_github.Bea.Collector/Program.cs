@@ -56,8 +56,6 @@ var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
         });
         //services.AddScoped<IEventSender, MessageQueueSender>();
         services.AddScoped<IEventSender, DataBaseSender>();
-
-        // Последний — тот, кого получит ThreadProcessor
         services.AddScoped<ICompositeEventSender, CompositeEventSender>();
         services.AddScoped<IParcer, CsvParser>();
         services.AddScoped<IEventProcessor, EventProcessorService>();

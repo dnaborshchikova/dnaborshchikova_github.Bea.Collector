@@ -42,6 +42,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                 });
 
                 thread.Start();
+                
             }
 
             countdown.Wait();

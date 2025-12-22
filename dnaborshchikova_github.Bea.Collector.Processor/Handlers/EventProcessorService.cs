@@ -24,7 +24,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 
         public void Process()
         {
-            Console.WriteLine($"Начата обработка файла.");
+            Console.WriteLine($"File processing started.");
             _logger.LogInformation($"Processing start {DateTime.Now}");
 
             var stopwatch = new Stopwatch();
@@ -40,7 +40,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 
             stopwatch.Stop();
             _logger.LogInformation($"Processing end {DateTime.Now}. Total processing time: {stopwatch.ElapsedMilliseconds} ms.");
-            Console.WriteLine($"Завершена обработка файла.");
+            Console.WriteLine($"File processing completed.");
         }
 
         public List<EventProcessRange> GenerateParts(List<BillEvent> billEvents, int threadCount)
