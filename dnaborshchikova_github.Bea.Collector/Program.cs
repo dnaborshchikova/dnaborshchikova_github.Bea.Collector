@@ -3,8 +3,10 @@ using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Processors;
+using dnaborshchikova_github.Bea.Collector.Sender;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
 using dnaborshchikova_github.Bea.Generator;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,7 +31,7 @@ if (appSettings.ProcessingSettings.RunAsProcess && appSettings.ProcessingSetting
 }
 else if (appSettings.ProcessingSettings.GenerateFile)
 {
-    var runner = new AppRunner(appSettings.GeneratorSettings);
+    var runner = new AppRunner(appSettings);
     runner.Generate();
 }
 
@@ -44,10 +46,6 @@ var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
         services.AddSingleton(appSettings);
         services.AddScoped<ThreadProcessor>();
         services.AddScoped<TaskProcessor>();
-        services.AddScoped<IParcer, CsvParser>();
-        services.AddScoped<IEventProcessor, EventProcessorService>();
-        services.AddScoped<IEventSender, MessageQueueSender>();
-        services.AddScoped<ILogger, Logger>();
         services.AddScoped<Func<string, IProcessor>>(provider => key =>
         {
             return key switch
@@ -56,9 +54,25 @@ var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
                 "Task" => provider.GetRequiredService<TaskProcessor>()
             };
         });
+        //services.AddScoped<IEventSender, MessageQueueSender>();
+        services.AddScoped<IEventSender, DataBaseSender>();
+
+        // Последний — тот, кого получит ThreadProcessor
+        services.AddScoped<ICompositeEventSender, CompositeEventSender>();
+        services.AddScoped<IParcer, CsvParser>();
+        services.AddScoped<IEventProcessor, EventProcessorService>();
+        services.AddScoped<ILogger, Logger>();
+        services.AddDbContext<CollectorDbContext>(options =>
+            options.UseNpgsql(config.GetConnectionString("Default")));
     })
     .UseSerilog()
     .Build();
+
+using (var scope = host.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
+    dbContext.Database.Migrate();
+}
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
 eventProcessor.Process();

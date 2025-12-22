@@ -33,9 +33,9 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
             var filePath = _appSettings.ProcessingSettings.FilePath;
             _logger.LogInformation($"Parse file start. File path: {filePath}");
 
-            var billEvents = _parcer.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();//
+            var billEvents = _parcer.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();
             var ranges = GenerateParts(billEvents, _appSettings.ProcessingSettings.ThreadCount);
-            var processor = _processor(_appSettings.ProcessingSettings.ProcessType); //
+            var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
             processor.Process(ranges);
 
             stopwatch.Stop();

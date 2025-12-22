@@ -17,12 +17,12 @@ namespace dnaborshchikova_github.Bea.Generator
             _configuration = configuration;
         }
 
-        public GeneratorSettings GetSettings()
+        public AppSettings GetSettings()
         {
             var settings = _configuration.GetSection(nameof(GeneratorSettings)).Get<GeneratorSettings>();
             settings.Validate();
 
-            return settings;
+            return new AppSettings(null, settings);
         }
     }
 }

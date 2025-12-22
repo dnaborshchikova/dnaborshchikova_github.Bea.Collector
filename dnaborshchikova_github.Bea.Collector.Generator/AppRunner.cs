@@ -11,12 +11,12 @@ namespace dnaborshchikova_github.Bea.Generator
     {
         private readonly IHost _host;
 
-        public AppRunner(GeneratorSettings generatorSettings)
+        public AppRunner(AppSettings appSettings)
         {
             _host = Host.CreateDefaultBuilder()
                      .ConfigureServices(services =>
                      {
-                         services.AddSingleton(generatorSettings);
+                         services.AddSingleton(appSettings);
                          services.AddScoped<CsvFileGenerator>();
                          services.AddScoped<XmlFileGenerator>();
                          services.AddScoped<Func<string, IFileGenerator>>(provider => key =>
