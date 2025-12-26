@@ -41,8 +41,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                     }
                 });
 
-                thread.Start();
-                
+                thread.Start();                
             }
 
             countdown.Wait();
@@ -51,7 +50,8 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             {
                 foreach (var ex in exceptions)
                 {
-                    Console.WriteLine($"При обработке данных возникли ошибки. Список ошибок сохранен в логфайле.");
+                    _logger.LogInformation($"При обработке данных возникли ошибки:\n" +
+                        $"{string.Format(";\n", ex.InnerException)}.");
                 }
             }
         }

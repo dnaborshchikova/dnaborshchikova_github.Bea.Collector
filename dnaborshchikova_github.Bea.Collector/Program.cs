@@ -4,14 +4,16 @@ using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Processors;
 using dnaborshchikova_github.Bea.Collector.Sender;
+using dnaborshchikova_github.Bea.Collector.Sender.DbContext;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
 using dnaborshchikova_github.Bea.Generator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Core;
+using Serilog.Events;
 
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -39,11 +41,18 @@ else if (appSettings.ProcessingSettings.GenerateFile)
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
     .CreateLogger();
 
-var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
+var host = Host.CreateDefaultBuilder()
+     .ConfigureLogging(logging =>
+     {
+         logging.ClearProviders();
+     })
+    .ConfigureServices(services =>
     {
         services.AddSingleton(appSettings);
+        services.AddScoped<DatabaseInitializer>();
         services.AddScoped<ThreadProcessor>();
         services.AddScoped<TaskProcessor>();
         services.AddScoped<Func<string, IProcessor>>(provider => key =>
@@ -59,9 +68,14 @@ var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
         services.AddScoped<ICompositeEventSender, CompositeEventSender>();
         services.AddScoped<IParcer, CsvParser>();
         services.AddScoped<IEventProcessor, EventProcessorService>();
-        services.AddScoped<ILogger, Logger>();
+        services.AddDbContextFactory<CollectorDbContext>(options =>
+        {
+            options.UseNpgsql(config.GetConnectionString("Default"))
+            .EnableSensitiveDataLogging(false);
+        });
         services.AddDbContext<CollectorDbContext>(options =>
-            options.UseNpgsql(config.GetConnectionString("Default")));
+            options.UseNpgsql(config.GetConnectionString("Default"))
+            .EnableSensitiveDataLogging(false));
     })
     .UseSerilog()
     .Build();
@@ -69,7 +83,8 @@ var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
 using (var scope = host.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
-    dbContext.Database.Migrate();
+    var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+    databaseInitializer.CreateDatabase();
 }
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
