@@ -53,13 +53,15 @@ var host = Host.CreateDefaultBuilder()
     {
         services.AddSingleton(appSettings);
         services.AddScoped<DatabaseInitializer>();
-        services.AddScoped<ThreadProcessor>();
+        services.AddScoped<ThreadProcessorWithLock>();
+        //services.AddScoped<ThreadProcessor>();
         services.AddScoped<TaskProcessor>();
         services.AddScoped<Func<string, IProcessor>>(provider => key =>
         {
             return key switch
             {
-                "Thread" => provider.GetRequiredService<ThreadProcessor>(),
+                "Thread" => provider.GetRequiredService<ThreadProcessorWithLock>(),
+                //"Thread" => provider.GetRequiredService<ThreadProcessor>(),
                 "Task" => provider.GetRequiredService<TaskProcessor>()
             };
         });
@@ -68,7 +70,6 @@ var host = Host.CreateDefaultBuilder()
         services.AddScoped<ICompositeEventSender, CompositeEventSender>();
         services.AddScoped<IParcer, CsvParser>();
         services.AddScoped<IEventProcessor, EventProcessorService>();
-        //services.AddScoped<ILogger, Logger>();
         services.AddDbContextFactory<CollectorDbContext>(options =>
         {
             options.UseNpgsql(config.GetConnectionString("Default"));

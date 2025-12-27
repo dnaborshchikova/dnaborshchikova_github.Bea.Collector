@@ -20,7 +20,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
         public void Process(List<EventProcessRange> ranges)
         {
             using var countdown = new CountdownEvent(ranges.Count);
-            var exceptions = new ConcurrentQueue<Exception>();
+            var exceptions = new ConcurrentQueue<string>();
 
             foreach (var range in ranges)
             {
@@ -32,8 +32,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogInformation(ex.InnerException, $"Ошибка в потоке обработки диапазона.");
-                        exceptions.Enqueue(ex);
+                        exceptions.Enqueue($"{ex.InnerException}. Range id {range.Id}");
                     }
                     finally
                     {
@@ -41,18 +40,15 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                     }
                 });
 
-                thread.Start();                
+                thread.Start();
             }
 
             countdown.Wait();
 
             if (!exceptions.IsEmpty)
             {
-                foreach (var ex in exceptions)
-                {
-                    _logger.LogInformation($"При обработке данных возникли ошибки:\n" +
-                        $"{string.Format(";\n", ex.InnerException)}.");
-                }
+                _logger.LogInformation($"При обработке данных возникли ошибки:\n" +
+                    $"{string.Join(";\n", exceptions)}");
             }
         }
     }

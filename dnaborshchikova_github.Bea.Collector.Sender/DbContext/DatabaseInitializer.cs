@@ -15,17 +15,14 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.DbContext
 
         public void CreateDatabase()
         {
-            using (_context)
-            {
-                if (_context.Database.CanConnect())
-                {
-                    _context.Database.EnsureDeleted();
-                    _logger.LogInformation("Database deleted.");
-                }
+            //if (_context.Database.CanConnect())
+            //{
+            //    _context.Database.EnsureDeleted();
+            //    _logger.LogInformation("Database deleted.");
+            //}
 
-                _context.Database.EnsureCreated();
-                _logger.LogInformation("Database created.");
-            }
+            //_context.Database.EnsureCreated();
+            //_logger.LogInformation("Database created.");
         }
     }
 }
