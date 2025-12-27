@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 
 var config = new ConfigurationBuilder()
@@ -41,7 +42,6 @@ else if (appSettings.ProcessingSettings.GenerateFile)
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
     .CreateLogger();
 
 var host = Host.CreateDefaultBuilder()
@@ -68,14 +68,13 @@ var host = Host.CreateDefaultBuilder()
         services.AddScoped<ICompositeEventSender, CompositeEventSender>();
         services.AddScoped<IParcer, CsvParser>();
         services.AddScoped<IEventProcessor, EventProcessorService>();
+        //services.AddScoped<ILogger, Logger>();
         services.AddDbContextFactory<CollectorDbContext>(options =>
         {
-            options.UseNpgsql(config.GetConnectionString("Default"))
-            .EnableSensitiveDataLogging(false);
+            options.UseNpgsql(config.GetConnectionString("Default"));
         });
         services.AddDbContext<CollectorDbContext>(options =>
-            options.UseNpgsql(config.GetConnectionString("Default"))
-            .EnableSensitiveDataLogging(false));
+            options.UseNpgsql(config.GetConnectionString("Default")));
     })
     .UseSerilog()
     .Build();

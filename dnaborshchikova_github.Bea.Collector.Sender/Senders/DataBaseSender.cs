@@ -2,28 +2,30 @@
 using dnaborshchikova_github.Bea.Collector.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 {
     public class DataBaseSender : IEventSender
     {
-        private readonly DbContextOptions<CollectorDbContext> _options;
         private readonly ILogger<DataBaseSender> _logger;
         private readonly IDbContextFactory<CollectorDbContext> _contextFactory;
 
-        public DataBaseSender(DbContextOptions<CollectorDbContext> options
-            , ILogger<DataBaseSender> logger, IDbContextFactory<CollectorDbContext> contextFactory)
+        public DataBaseSender(ILogger<DataBaseSender> logger
+            , IDbContextFactory<CollectorDbContext> contextFactory)
         {
-            _options = options;
             _logger = logger;
             _contextFactory = contextFactory;
         }
 
         public void Send(EventProcessRange range)
         {
-            using var dbContext = _contextFactory.CreateDbContext();
+            _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}."); 
 
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            using var dbContext = _contextFactory.CreateDbContext();
             foreach (var billEvent in range.BillEvents)
             {
                 var billData = billEvent switch
@@ -39,7 +41,10 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
                 dbContext.SendEvents.Add(sendEvent);
             }
             dbContext.SaveChanges();
-            _logger.LogInformation($"Range saved. Range id: {range.Id}. Event count: {range.BillEvents.Count}");
+            stopwatch.Stop();
+
+            _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
+                $"Work time: {stopwatch.ElapsedMilliseconds} ms.");
         }
     }
 }

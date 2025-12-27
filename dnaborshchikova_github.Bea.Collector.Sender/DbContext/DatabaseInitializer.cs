@@ -7,9 +7,10 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.DbContext
         private readonly CollectorDbContext _context;
         private readonly ILogger<DatabaseInitializer> _logger;
 
-        public DatabaseInitializer(CollectorDbContext context)
+        public DatabaseInitializer(CollectorDbContext context, ILogger<DatabaseInitializer> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public void CreateDatabase()

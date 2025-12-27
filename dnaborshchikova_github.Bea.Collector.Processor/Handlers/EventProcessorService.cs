@@ -24,13 +24,12 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 
         public void Process()
         {
-            _logger.LogInformation($"Processing start {DateTime.Now}");
-
+            _logger.LogInformation($"Start processing {DateTime.Now}");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             var filePath = _appSettings.ProcessingSettings.FilePath;
-            _logger.LogInformation($"Parse file start. File path: {filePath}");
+            _logger.LogInformation($"Parse file. File path: {filePath}");
 
             var billEvents = _parcer.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();
             var ranges = GenerateParts(billEvents, _appSettings.ProcessingSettings.ThreadCount);
@@ -38,12 +37,12 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
             processor.Process(ranges);
 
             stopwatch.Stop();
-            _logger.LogInformation($"Processing end {DateTime.Now}. Total processing time: {stopwatch.ElapsedMilliseconds} ms.");
+            _logger.LogInformation($"End processing {DateTime.Now}. Total processing time: {stopwatch.ElapsedMilliseconds} ms.");
         }
 
         public List<EventProcessRange> GenerateParts(List<BillEvent> billEvents, int threadCount)
         {
-            _logger.LogInformation($"Fill ranges start.");
+            _logger.LogInformation($"Start generate event ranges.");
 
             var dateRanges = GetDataRanges(billEvents, threadCount);
             var eventRanges = new List<EventProcessRange>();
@@ -63,17 +62,15 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 
                 var range = new EventProcessRange(i + 1, events);
                 eventRanges.Add(range);
-                _logger.LogInformation($"Filling range end. Range id: {range.Id}. Events count: {events.Count}.");
+                _logger.LogInformation($"Generate event range end. Range id: {range.Id}. Events count: {events.Count}.");
             }
 
-            _logger.LogInformation($"Fill ranges end.");
+            _logger.LogInformation($"End generate event ranges.\n");
             return eventRanges;
         }
 
         private List<DateTime> GetDataRanges(List<BillEvent> billEvents, int threadCount)
         {
-            _logger.LogInformation($"Generating ranges start. Event count {billEvents.Count}. Thread count {threadCount}");
-
             var dates = billEvents.Select(e => e.OperationDateTime.Date).ToList();
             var minDate = dates.Min(e => e.Date);
             var maxDate = dates.Max(e => e.Date);
@@ -92,7 +89,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
                 dateRanges = new List<DateTime> { minDate };
             }
 
-            _logger.LogInformation($"Generating ranges end. Range count: {dateRanges.Count}.");
+            _logger.LogInformation($"Generate date ranges. Range count: {dateRanges.Count}.");
             return dateRanges;
         }
     }
