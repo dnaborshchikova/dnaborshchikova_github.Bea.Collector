@@ -20,7 +20,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
         public void Process(List<EventProcessRange> ranges)
         {
             using var countdown = new CountdownEvent(ranges.Count);
-            var exceptions = new ConcurrentQueue<string>();
+            var exceptions = new ConcurrentQueue<Exception>();
 
             foreach (var range in ranges)
             {
@@ -32,7 +32,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                     }
                     catch (Exception ex)
                     {
-                        exceptions.Enqueue($"{ex.InnerException}. Range id {range.Id}");
+                        exceptions.Enqueue(ex);
                     }
                     finally
                     {

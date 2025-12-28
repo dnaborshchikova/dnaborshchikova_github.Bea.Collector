@@ -21,7 +21,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
         public void Process(List<EventProcessRange> ranges)
         {
             completedThreads = ranges.Count;
-            var exceptions = new List<string>();
+            var exceptions = new List<Exception>();
 
             foreach (var range in ranges)
             {
@@ -44,7 +44,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             }
         }
 
-        private void ProcessRange(EventProcessRange range, List<string> exceptions)
+        private void ProcessRange(EventProcessRange range, List<Exception> exceptions)
         {
             try
             {
@@ -52,11 +52,11 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.InnerException, $"Ошибка в потоке обработки диапазона. " +
+                _logger.LogInformation(ex, $"Ошибка в потоке обработки диапазона. " +
                     $"Range id {range.Id}");
                 lock (locker)
                 {
-                    exceptions.Add($"{ex.InnerException}. Range id {range.Id}"); 
+                    exceptions.Add(ex);
                 }
             }
             finally
