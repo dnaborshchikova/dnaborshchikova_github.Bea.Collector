@@ -26,6 +26,9 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             using var dbContext = _contextFactory.CreateDbContext();
+            var batchSize = 5000;
+            var count = 0;
+            dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
 
             foreach (var billEvent in range.BillEvents)
             {
@@ -40,6 +43,13 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
                     billEvent.UserId, billEvent.EventType, billData);
 
                 dbContext.SendEvents.Add(sendEvent);
+                count++;
+
+                if (count % batchSize == 0)
+                {
+                    dbContext.SaveChanges();
+                    dbContext.ChangeTracker.Clear();
+                }
             }
             dbContext.SaveChanges();
             stopwatch.Stop();
