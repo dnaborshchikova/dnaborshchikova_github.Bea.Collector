@@ -3,13 +3,18 @@ using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Processors;
+using dnaborshchikova_github.Bea.Collector.Sender;
+using dnaborshchikova_github.Bea.Collector.Sender.DbContext;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
 using dnaborshchikova_github.Bea.Generator;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
+using Serilog.Events;
 
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -29,7 +34,7 @@ if (appSettings.ProcessingSettings.RunAsProcess && appSettings.ProcessingSetting
 }
 else if (appSettings.ProcessingSettings.GenerateFile)
 {
-    var runner = new AppRunner(appSettings.GeneratorSettings);
+    var runner = new AppRunner(appSettings);
     runner.Generate();
 }
 
@@ -39,26 +44,48 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
     .CreateLogger();
 
-var host = Host.CreateDefaultBuilder().ConfigureServices(services =>
+var host = Host.CreateDefaultBuilder()
+     .ConfigureLogging(logging =>
+     {
+         logging.ClearProviders();
+     })
+    .ConfigureServices(services =>
     {
         services.AddSingleton(appSettings);
-        services.AddScoped<ThreadProcessor>();
+        services.AddScoped<DatabaseInitializer>();
+        services.AddScoped<ThreadProcessorWithLock>();
+        //services.AddScoped<ThreadProcessor>();
         services.AddScoped<TaskProcessor>();
-        services.AddScoped<IParcer, CsvParser>();
-        services.AddScoped<IEventProcessor, EventProcessorService>();
-        services.AddScoped<IEventSender, MessageQueueSender>();
-        services.AddScoped<ILogger, Logger>();
         services.AddScoped<Func<string, IProcessor>>(provider => key =>
         {
             return key switch
             {
-                "Thread" => provider.GetRequiredService<ThreadProcessor>(),
+                "Thread" => provider.GetRequiredService<ThreadProcessorWithLock>(),
+                //"Thread" => provider.GetRequiredService<ThreadProcessor>(),
                 "Task" => provider.GetRequiredService<TaskProcessor>()
             };
         });
+        //services.AddScoped<IEventSender, MessageQueueSender>();
+        services.AddScoped<IEventSender, DataBaseSender>();
+        services.AddScoped<ICompositeEventSender, CompositeEventSender>();
+        services.AddScoped<IParcer, CsvParser>();
+        services.AddScoped<IEventProcessor, EventProcessorService>();
+        services.AddDbContextFactory<CollectorDbContext>(options =>
+        {
+            options.UseNpgsql(config.GetConnectionString("Default"));
+        });
+        services.AddDbContext<CollectorDbContext>(options =>
+            options.UseNpgsql(config.GetConnectionString("Default")));
     })
     .UseSerilog()
     .Build();
+
+using (var scope = host.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
+    var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+    databaseInitializer.CreateDatabase();
+}
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
 eventProcessor.Process();

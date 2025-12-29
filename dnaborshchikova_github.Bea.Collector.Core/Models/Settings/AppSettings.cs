@@ -8,8 +8,7 @@
         public AppSettings(ProcessingSettings processingSettings, GeneratorSettings generatorSettings)
         {
             generatorSettings.Validate();
-            processingSettings.Validate();
-
+            processingSettings?.Validate();
             this.ProcessingSettings = processingSettings;
             this.GeneratorSettings = generatorSettings;
         }
