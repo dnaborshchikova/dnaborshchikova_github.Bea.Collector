@@ -7,10 +7,13 @@
 
         public AppSettings(ProcessingSettings processingSettings, GeneratorSettings generatorSettings)
         {
+            this.ProcessingSettings = processingSettings
+                ?? throw new ArgumentNullException(nameof(processingSettings));
+            this.GeneratorSettings = generatorSettings
+                ?? throw new ArgumentNullException(nameof(generatorSettings));
+
             generatorSettings.Validate();
-            processingSettings?.Validate();
-            this.ProcessingSettings = processingSettings;
-            this.GeneratorSettings = generatorSettings;
+            processingSettings.Validate();
         }
     }
 }

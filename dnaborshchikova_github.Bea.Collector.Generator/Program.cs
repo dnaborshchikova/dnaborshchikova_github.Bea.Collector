@@ -1,9 +1,10 @@
 ﻿using dnaborshchikova_github.Bea.Generator;
 using Microsoft.Extensions.Configuration;
 
-Console.WriteLine("Генератор запущен.");
+Console.Error.WriteLine("Генератор запущен.");
 
 var config = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
     .AddJsonFile("appsettings.json")
     .Build();
 
@@ -11,7 +12,7 @@ var settingsService = new GeneratorSettingsService(config);
 var settings = settingsService.GetSettings();
 
 var runner = new AppRunner(settings);
-runner.Generate();
+var filePath = runner.Generate();
 
-Console.WriteLine("Генерация завершена.");
-Console.ReadLine();
+Console.Error.WriteLine("Генерация завершена");
+Console.Out.WriteLine(filePath);

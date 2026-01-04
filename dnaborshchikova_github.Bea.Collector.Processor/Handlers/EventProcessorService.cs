@@ -24,7 +24,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 
         public void Process()
         {
-            _logger.LogInformation($"Start processing {DateTime.Now}");
+            _logger.LogInformation($"Start processing {DateTime.Now}.");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -65,7 +65,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
                 _logger.LogInformation($"Generate event range end. Range id: {range.Id}. Events count: {events.Count}.");
             }
 
-            _logger.LogInformation($"End generate event ranges.\n");
+            _logger.LogInformation($"End generate event ranges.");
             return eventRanges;
         }
 
@@ -89,7 +89,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
                 dateRanges = new List<DateTime> { minDate };
             }
 
-            _logger.LogInformation($"Generate date ranges. Range count: {dateRanges.Count}.");
+            _logger.LogInformation($"Generate date ranges end. Range count: {dateRanges.Count}.");
             return dateRanges;
         }
     }

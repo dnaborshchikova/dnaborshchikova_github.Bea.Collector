@@ -13,8 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
+using System.Diagnostics;
 
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -23,21 +22,7 @@ var validator = new AppSettingsService(config);
 var appSettings = validator.CreateAppSettings();
 
 #region Запуск генератора
-
-if (appSettings.ProcessingSettings.RunAsProcess && appSettings.ProcessingSettings.GenerateFile)
-{
-    var proccess = new System.Diagnostics.Process();
-    appSettings.GeneratorSettings.FileFormat = Path.Combine(AppContext.BaseDirectory, $"{DateTime.Now.ToShortDateString()}_BillEvent.csv");
-    proccess.StartInfo.FileName = Path.Combine(AppContext.BaseDirectory, $"dnaborshchikova_github.Bea.Generator.exe");
-    proccess.Start();
-    proccess.WaitForExit();
-}
-else if (appSettings.ProcessingSettings.GenerateFile)
-{
-    var runner = new AppRunner(appSettings);
-    runner.Generate();
-}
-
+RunGenerator();
 #endregion
 
 Log.Logger = new LoggerConfiguration()
@@ -90,3 +75,38 @@ using (var scope = host.Services.CreateScope())
 var eventProcessor = host.Services.GetService<IEventProcessor>();
 eventProcessor.Process();
 Console.ReadLine();
+
+void RunGenerator()
+{
+    if (appSettings.ProcessingSettings.GeneratorRunAsProcess && appSettings.ProcessingSettings.GenerateFile)
+    {
+        var proccess = new Process()
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = Path.Combine(AppContext.BaseDirectory, "dnaborshchikova_github.Bea.Generator.exe"),
+                WorkingDirectory = Path.Combine(AppContext.BaseDirectory),
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }
+        };
+        proccess.Start();
+        var output = proccess.StandardOutput.ReadToEnd();
+        var error = proccess.StandardError.ReadToEnd();
+        proccess.WaitForExit();
+
+        if (proccess.ExitCode != 0)
+        {
+            throw new Exception($"Generator failed: {error}");
+        }
+
+        appSettings.ProcessingSettings.FilePath = output.Trim();
+    }
+    else if (appSettings.ProcessingSettings.GenerateFile)
+    {
+        var runner = new AppRunner(appSettings.GeneratorSettings);
+        appSettings.ProcessingSettings.FilePath = runner.Generate();
+    }
+}

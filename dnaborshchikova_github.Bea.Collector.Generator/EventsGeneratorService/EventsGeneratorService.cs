@@ -1,30 +1,31 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Generator.DataGeneration;
 using dnaborshchikova_github.Bea.Generator.FileGeneration;
-using System.Diagnostics.CodeAnalysis;
 
 namespace dnaborshchikova_github.Bea.Generator.EventsGeneratorService
 {
     public class EventsGeneratorService : IEventsGeneratorService
     {
-        private readonly AppSettings _appSettings;
+        private readonly GeneratorSettings _generatorSettings;
         private readonly IDataGenerator _dataGenerator;
         private readonly Func<string, IFileGenerator> _fileGeneratorFactory;
 
         public EventsGeneratorService(IDataGenerator dataGenerator, Func<string, IFileGenerator> fileGeneratorFactory
-            , AppSettings appSettings)
+            , GeneratorSettings generatorSettings)
         {
-            _appSettings = appSettings;
+            _generatorSettings = generatorSettings;
             _dataGenerator = dataGenerator;
             _fileGeneratorFactory = fileGeneratorFactory;
         }
 
-        public void GenerateEvents()
+        public string GenerateEvents()
         {
-            var events = _dataGenerator.GenerateEvents(_appSettings.GeneratorSettings.PaidBillEventCount
-                , _appSettings.GeneratorSettings.CancelledBillEventCount);
-            var fileGenerator = _fileGeneratorFactory(_appSettings.GeneratorSettings.FileFormat);
-            fileGenerator.GenerateFile(events);
+            var events = _dataGenerator.GenerateEvents(_generatorSettings.PaidBillEventCount
+                , _generatorSettings.CancelledBillEventCount);
+            var fileGenerator = _fileGeneratorFactory(_generatorSettings.FileFormat);
+            var filePath = fileGenerator.GenerateFile(events);
+
+            return filePath;
         }
     }
 }

@@ -21,7 +21,8 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 
         public void Send(EventProcessRange range)
         {
-            _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}.");
+            _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}." +
+                $"Thread id: {Thread.CurrentThread.ManagedThreadId}.");
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -54,8 +55,9 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
             dbContext.SaveChanges();
             stopwatch.Stop();
 
-            _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
-                $"Work time: {stopwatch.ElapsedMilliseconds} ms.");
+            _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. "
+                + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. " 
+                + $"Work time: {stopwatch.ElapsedMilliseconds} ms.");
         }
     }
 }

@@ -6,7 +6,7 @@ namespace dnaborshchikova_github.Bea.Generator.FileGeneration
 {
     public class CsvFileGenerator : IFileGenerator
     {
-        public void GenerateFile(List<BillEvent> billEvents)
+        public string GenerateFile(List<BillEvent> billEvents) //передать настройки appSettings.GeneratorSettings.FileFormat или вернуть путь
         {
             var fileName = $"{DateTime.Now.ToShortDateString()}_BillEvent.csv";
             var filePath = Path.Combine(AppContext.BaseDirectory, fileName);
@@ -47,6 +47,8 @@ namespace dnaborshchikova_github.Bea.Generator.FileGeneration
                     writer.WriteLine(string.Join(",", billRecord));
                 }
             }
+
+            return filePath;
         }
     }
 }

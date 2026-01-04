@@ -1,10 +1,5 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace dnaborshchikova_github.Bea.Generator
 {
@@ -17,12 +12,12 @@ namespace dnaborshchikova_github.Bea.Generator
             _configuration = configuration;
         }
 
-        public AppSettings GetSettings()
+        public GeneratorSettings GetSettings()
         {
             var settings = _configuration.GetSection(nameof(GeneratorSettings)).Get<GeneratorSettings>();
-            settings.Validate();
 
-            return new AppSettings(null, settings);
+            return new GeneratorSettings(settings.FileFormat, settings.PaidBillEventCount
+                , settings.CancelledBillEventCount);
         }
     }
 }
