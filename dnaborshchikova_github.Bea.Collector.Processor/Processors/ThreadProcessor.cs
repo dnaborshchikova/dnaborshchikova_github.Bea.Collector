@@ -20,7 +20,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
         public void Process(List<EventProcessRange> ranges)
         {
             using var countdown = new CountdownEvent(ranges.Count);
-            var exceptions = new ConcurrentQueue<Exception>();
+            var exceptions = new ConcurrentQueue<(int rangeId, int threadId, Exception ex)>();
 
             foreach (var range in ranges)
             {
@@ -32,7 +32,10 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                     }
                     catch (Exception ex)
                     {
-                        exceptions.Enqueue(ex);
+                        _logger.LogInformation($"Ошибка обработки RangeId={range.Id}" +
+                            $"в ThreadId={Thread.CurrentThread.ManagedThreadId}: {ex.Message}");
+
+                        exceptions.Enqueue((range.Id, Thread.CurrentThread.ManagedThreadId, ex));
                     }
                     finally
                     {
@@ -47,8 +50,11 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 
             if (!exceptions.IsEmpty)
             {
-                _logger.LogInformation($"При обработке данных возникли ошибки:\n" +
-                    $"{string.Join(";\n", exceptions)}");
+                foreach (var (rangeId, threadId, ex) in exceptions)
+                {
+                    _logger.LogError(ex, $"Подробная информация об ошибке в " +
+                        $"ThreadId={Thread.CurrentThread.ManagedThreadId} при обработке RangeId={rangeId}");
+                }
             }
         }
     }

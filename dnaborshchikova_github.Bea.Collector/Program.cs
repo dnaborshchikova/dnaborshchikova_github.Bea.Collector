@@ -39,14 +39,14 @@ var host = Host.CreateDefaultBuilder()
         services.AddSingleton(appSettings);
         services.AddScoped<DatabaseInitializer>();
         services.AddScoped<ThreadProcessorWithLock>();
-        //services.AddScoped<ThreadProcessor>();
+        services.AddScoped<ThreadProcessor>();
         services.AddScoped<TaskProcessor>();
         services.AddScoped<Func<string, IProcessor>>(provider => key =>
         {
             return key switch
             {
-                "Thread" => provider.GetRequiredService<ThreadProcessorWithLock>(),
-                //"Thread" => provider.GetRequiredService<ThreadProcessor>(),
+                //"Thread" => provider.GetRequiredService<ThreadProcessorWithLock>(),
+                "Thread" => provider.GetRequiredService<ThreadProcessor>(),
                 "Task" => provider.GetRequiredService<TaskProcessor>()
             };
         });

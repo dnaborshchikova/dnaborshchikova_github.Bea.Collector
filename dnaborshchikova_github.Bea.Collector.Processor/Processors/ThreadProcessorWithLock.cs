@@ -54,6 +54,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             {
                 _logger.LogInformation(ex, $"Ошибка в потоке обработки диапазона." +
                     $"Thread id: {Thread.CurrentThread.ManagedThreadId}. Range id {range.Id}");
+
                 lock (locker)
                 {
                     exceptions.Add(ex);
