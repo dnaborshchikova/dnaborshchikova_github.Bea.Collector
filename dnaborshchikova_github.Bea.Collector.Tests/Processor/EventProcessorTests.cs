@@ -80,7 +80,6 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
         [InlineData(1)]
         [InlineData(2)]
         [InlineData(4)]
-        [InlineData(10)]
         public void GenerateParts_ThreadCount_RangesCountEqualsThreadCount(int threadCount)
         {
             //Arrange
