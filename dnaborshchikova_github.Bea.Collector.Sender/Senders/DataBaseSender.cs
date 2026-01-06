@@ -21,40 +21,49 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 
         public void Send(EventProcessRange range)
         {
-            _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}." +
+            _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
                 $"Thread id: {Thread.CurrentThread.ManagedThreadId}.");
-
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            using var dbContext = _contextFactory.CreateDbContext();
+
             var batchSize = 5000;
             var count = 0;
+            using var dbContext = _contextFactory.CreateDbContext();
             dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
-
-            foreach (var billEvent in range.BillEvents)
+            using var transaction = dbContext.Database.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
+            try
             {
-                var billData = billEvent switch
+                foreach (var billEvent in range.BillEvents)
                 {
-                    PaidBillEvent paid => JsonSerializer.Serialize(paid),
-                    CancelledBillEvent cancelled => JsonSerializer.Serialize(cancelled)
-                };
-                var utcTime = DateTime.SpecifyKind(billEvent.OperationDateTime, DateTimeKind.Utc);
+                    var billData = billEvent switch
+                    {
+                        PaidBillEvent paid => JsonSerializer.Serialize(paid),
+                        CancelledBillEvent cancelled => JsonSerializer.Serialize(cancelled)
+                    };
+                    var utcTime = DateTime.SpecifyKind(billEvent.OperationDateTime, DateTimeKind.Utc);
 
-                var sendEvent = new SendEvent(billEvent.Id, utcTime,
-                    billEvent.UserId, billEvent.EventType, billData);
+                    var sendEvent = new SendEvent(billEvent.Id, utcTime,
+                        billEvent.UserId, billEvent.EventType, billData);
 
-                dbContext.SendEvents.Add(sendEvent);
-                count++;
+                    dbContext.SendEvents.Add(sendEvent);
+                    count++;
 
-                if (count % batchSize == 0)
-                {
-                    dbContext.SaveChanges();
-                    dbContext.ChangeTracker.Clear();
+                    if (count % batchSize == 0)
+                    {
+                        dbContext.SaveChanges();
+                        dbContext.ChangeTracker.Clear();
+                    }
                 }
+                dbContext.SaveChanges();
+                transaction.Commit();
             }
-            dbContext.SaveChanges();
-            stopwatch.Stop();
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw;
+            }
 
+            stopwatch.Stop();
             _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. "
                 + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. " 
                 + $"Work time: {stopwatch.ElapsedMilliseconds} ms.");

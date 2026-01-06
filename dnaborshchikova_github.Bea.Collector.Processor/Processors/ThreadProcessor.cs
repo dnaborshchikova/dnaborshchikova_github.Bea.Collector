@@ -32,9 +32,8 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogInformation($"Ошибка обработки RangeId={range.Id}" +
-                            $"в ThreadId={Thread.CurrentThread.ManagedThreadId}: {ex.Message}");
-
+                        _logger.LogError($"Error save events. Range id: {range.Id}. " +
+                            $"Thread id: {Thread.CurrentThread.ManagedThreadId}. Error: {ex.Message}");
                         exceptions.Enqueue((range.Id, Thread.CurrentThread.ManagedThreadId, ex));
                     }
                     finally

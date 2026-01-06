@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Filters;
 using System.Diagnostics;
 
 var config = new ConfigurationBuilder()
@@ -27,6 +28,9 @@ RunGenerator();
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
+    .Filter.ByExcluding(Matching.FromSource("Microsoft.EntityFrameworkCore.Database.Command"))
+    .Filter.ByExcluding(Matching.FromSource("Microsoft.EntityFrameworkCore.Update"))
+    .Filter.ByExcluding(Matching.FromSource("Microsoft.EntityFrameworkCore.ChangeTracking"))
     .CreateLogger();
 
 var host = Host.CreateDefaultBuilder()
@@ -69,7 +73,7 @@ using (var scope = host.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
     var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
-    databaseInitializer.CreateDatabase();
+    //databaseInitializer.CreateDatabase();
 }
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
