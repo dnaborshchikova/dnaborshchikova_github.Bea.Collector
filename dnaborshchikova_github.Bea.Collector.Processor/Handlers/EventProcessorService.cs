@@ -24,68 +24,63 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 
         public void Process()
         {
-            Console.WriteLine($"Начата обработка файла.");
-            _logger.LogInformation($"Processing start {DateTime.Now}");
-
+            _logger.LogInformation($"Start processing {DateTime.Now}.");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             var filePath = _appSettings.ProcessingSettings.FilePath;
-            _logger.LogInformation($"Parse file start. File path: {filePath}");
+            _logger.LogInformation($"Parse file. File path: {filePath}");
 
-            var billEvents = _parcer.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();//
+            var billEvents = _parcer.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();
             var ranges = GenerateParts(billEvents, _appSettings.ProcessingSettings.ThreadCount);
-            var processor = _processor(_appSettings.ProcessingSettings.ProcessType); //
+            var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
             processor.Process(ranges);
 
             stopwatch.Stop();
-            _logger.LogInformation($"Processing end {DateTime.Now}. Total processing time: {stopwatch.ElapsedMilliseconds} ms.");
-            Console.WriteLine($"Завершена обработка файла.");
+            _logger.LogInformation($"End processing {DateTime.Now}. Total processing time: {stopwatch.ElapsedMilliseconds} ms.");
         }
 
         public List<EventProcessRange> GenerateParts(List<BillEvent> billEvents, int threadCount)
         {
-            _logger.LogInformation($"Fill ranges start.");
+            _logger.LogInformation($"Start generate event ranges.");
 
             var dateRanges = GetDataRanges(billEvents, threadCount);
             var eventRanges = new List<EventProcessRange>();
+
             for (int i = 0; i < dateRanges.Count; i++)
             {
                 var nextRangeIndex = i + 1;
                 var events = new List<BillEvent>();
                 if (nextRangeIndex < dateRanges.Count)
                 {
-                    events = billEvents.Where(e => e.OperationDateTime.Date >= dateRanges[i]
-                                            && e.OperationDateTime.Date < dateRanges[nextRangeIndex]).ToList();
+                    events = billEvents.Where(e => e.OperationDateTime >= dateRanges[i]
+                                            && e.OperationDateTime < dateRanges[nextRangeIndex]).ToList();
                 }
                 else
                 {
-                    events = billEvents.Where(e => e.OperationDateTime.Date >= dateRanges[i]).ToList();
+                    events = billEvents.Where(e => e.OperationDateTime >= dateRanges[i]).ToList();
                 }
 
                 var range = new EventProcessRange(i + 1, events);
                 eventRanges.Add(range);
-                _logger.LogInformation($"Filling range end. Range id: {range.Id}. Events count: {events.Count}.");
+                _logger.LogInformation($"Generate event range end. Range id: {range.Id}. Events count: {events.Count}.");
             }
 
-            _logger.LogInformation($"Fill ranges end.");
+            _logger.LogInformation($"End generate event ranges.");
             return eventRanges;
         }
 
         private List<DateTime> GetDataRanges(List<BillEvent> billEvents, int threadCount)
         {
-            _logger.LogInformation($"Generating ranges start. Event count {billEvents.Count}. Thread count {threadCount}");
-
-            var dates = billEvents.Select(e => e.OperationDateTime.Date).ToList();
-            var minDate = dates.Min(e => e.Date);
-            var maxDate = dates.Max(e => e.Date);
+            var dates = billEvents.Select(e => e.OperationDateTime).ToList();
+            var minDate = dates.Min();
+            var maxDate = dates.Max();
             var total = maxDate - minDate;
             var step = TimeSpan.FromTicks(total.Ticks / threadCount);
             var dateRanges = new List<DateTime>();
 
             if (threadCount != 1)
             {
-                dateRanges = new List<DateTime>();
                 for (int i = 0; i < threadCount; i++)
                     dateRanges.Add(minDate + TimeSpan.FromTicks(step.Ticks * i));
             }
@@ -94,7 +89,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
                 dateRanges = new List<DateTime> { minDate };
             }
 
-            _logger.LogInformation($"Generating ranges end. Range count: {dateRanges.Count}.");
+            _logger.LogInformation($"Generate date ranges end. Range count: {dateRanges.Count}.");
             return dateRanges;
         }
     }

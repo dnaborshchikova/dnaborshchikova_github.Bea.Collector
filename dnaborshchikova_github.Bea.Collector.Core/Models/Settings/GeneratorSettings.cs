@@ -16,6 +16,8 @@
             FileFormat = fileFormat;
             PaidBillEventCount = paidBillEventCount;
             CancelledBillEventCount = cancelledBillEventCount;
+
+            Validate();
         }
 
         public void Validate()

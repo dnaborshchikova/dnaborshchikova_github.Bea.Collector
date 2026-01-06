@@ -2,6 +2,6 @@
 {
     public interface IEventsGeneratorService
     {
-        public void GenerateEvents();
+        public string GenerateEvents();
     }
 }

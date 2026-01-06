@@ -1,0 +1,73 @@
+﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
+using dnaborshchikova_github.Bea.Collector.Core.Models;
+using Microsoft.Extensions.Logging;
+
+namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
+{
+    public class ThreadProcessorWithLock : IProcessor
+    {
+        private readonly ICompositeEventSender _compositeEventSender;
+        private readonly ILogger<ThreadProcessor> _logger;
+        private readonly object locker = new object();
+        private int completedThreads;
+
+        public ThreadProcessorWithLock(ICompositeEventSender compositeEventSender
+            , ILogger<ThreadProcessor> logger)
+        {
+            _compositeEventSender = compositeEventSender;
+            _logger = logger;
+        }
+
+        public void Process(List<EventProcessRange> ranges)
+        {
+            completedThreads = ranges.Count;
+            var exceptions = new List<Exception>();
+
+            foreach (var range in ranges)
+            {
+                var thread = new Thread(() => ProcessRange(range, exceptions));
+                thread.Start();
+            }
+
+            lock (locker)
+            {
+                while (completedThreads > 0)
+                {
+                    Monitor.Wait(locker);
+                }
+            }
+
+            if (exceptions.Count > 0)
+            {
+                _logger.LogInformation($"При обработке данных возникли ошибки:\n" +
+                    $"{string.Join(";\n", exceptions)}");
+            }
+        }
+
+        private void ProcessRange(EventProcessRange range, List<Exception> exceptions)
+        {
+            try
+            {
+                _compositeEventSender.Send(range);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, $"Ошибка в потоке обработки диапазона." +
+                    $"Thread id: {Thread.CurrentThread.ManagedThreadId}. Range id {range.Id}");
+
+                lock (locker)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+            finally
+            {
+                lock (locker)
+                {
+                    completedThreads--;
+                    Monitor.Pulse(locker);
+                }
+            }
+        }
+    }
+}

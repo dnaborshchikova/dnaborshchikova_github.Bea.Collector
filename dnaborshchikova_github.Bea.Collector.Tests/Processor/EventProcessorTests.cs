@@ -25,7 +25,7 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
         {
             var processingSettings = new ProcessingSettings
             {
-                RunAsProcess = false,
+                GeneratorRunAsProcess = false,
                 GenerateFile = false,
                 FilePath = "C:\\13.12.2025_BillEvent.csv",
                 ThreadCount = threadCount,
@@ -92,6 +92,20 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
                 new(Guid.NewGuid(), new DateTime(2025, 12, 10, 12, 0, 0), userId, "bill_canceled", 200m, "INV-002"),
                 new(Guid.NewGuid(), new DateTime(2025, 12, 11, 9, 0, 0), userId, "bill_payed", 150m, "INV-003"),
                 new(Guid.NewGuid(), new DateTime(2025, 12, 12, 18, 30, 0), userId, "bill_payed", 300m, "INV-004"),
+
+                new(Guid.NewGuid(), new DateTime(2024, 12, 10, 10, 0, 0), userId, "bill_payed", 100m, "INV-001"),
+                new(Guid.NewGuid(), new DateTime(2024, 12, 10, 12, 0, 0), userId, "bill_canceled", 200m, "INV-002"),
+                new(Guid.NewGuid(), new DateTime(2025, 07, 11, 9, 0, 0), userId, "bill_payed", 150m, "INV-003"),
+                new(Guid.NewGuid(), new DateTime(2025, 08, 12, 18, 30, 0), userId, "bill_payed", 300m, "INV-004"),
+
+
+                new(Guid.NewGuid(), new DateTime(2025, 01, 10, 10, 0, 0), userId, "bill_payed", 100m, "INV-001"),
+                new(Guid.NewGuid(), new DateTime(2025, 01, 10, 12, 0, 0), userId, "bill_canceled", 200m, "INV-002"),
+                new(Guid.NewGuid(), new DateTime(2025, 03, 11, 9, 0, 0), userId, "bill_payed", 150m, "INV-003"),
+                new(Guid.NewGuid(), new DateTime(2025, 04, 12, 18, 30, 0), userId, "bill_payed", 300m, "INV-004"),
+
+                new(Guid.NewGuid(), new DateTime(2025, 12, 11, 9, 0, 0), userId, "bill_payed", 150m, "INV-003"),
+                new(Guid.NewGuid(), new DateTime(2025, 12, 12, 18, 30, 0), userId, "bill_payed", 300m, "INV-004")
             };
 
             //Act
@@ -99,6 +113,7 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
 
             //Assert
             ranges.Count.Should().Be(threadCount);
+            ranges.ForEach(r => r.BillEvents.Count.Should().NotBe(0));
         }
     }
 }

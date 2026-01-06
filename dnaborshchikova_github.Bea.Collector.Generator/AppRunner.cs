@@ -11,12 +11,12 @@ namespace dnaborshchikova_github.Bea.Generator
     {
         private readonly IHost _host;
 
-        public AppRunner(GeneratorSettings generatorSettings)
+        public AppRunner(GeneratorSettings settings)
         {
             _host = Host.CreateDefaultBuilder()
                      .ConfigureServices(services =>
                      {
-                         services.AddSingleton(generatorSettings);
+                         services.AddSingleton(settings);
                          services.AddScoped<CsvFileGenerator>();
                          services.AddScoped<XmlFileGenerator>();
                          services.AddScoped<Func<string, IFileGenerator>>(provider => key =>
@@ -34,11 +34,13 @@ namespace dnaborshchikova_github.Bea.Generator
                      .Build();
         }
 
-        public void Generate()
+        public string Generate()
         {
             using var scope = _host.Services.CreateScope();
             var eventsGeneratorService = scope.ServiceProvider.GetRequiredService<IEventsGeneratorService>();
-            eventsGeneratorService.GenerateEvents();
+            var filepath = eventsGeneratorService.GenerateEvents();
+
+            return filepath;
         }
     }
 }
