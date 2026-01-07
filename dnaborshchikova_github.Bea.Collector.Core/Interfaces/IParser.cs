@@ -2,7 +2,7 @@
 
 namespace dnaborshchikova_github.Bea.Collector.Core.Interfaces
 {
-    public interface IParcer
+    public interface IParser
     {
         public List<BillEvent> Parse(string filePath);
     }
