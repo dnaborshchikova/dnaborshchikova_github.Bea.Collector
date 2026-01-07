@@ -2,8 +2,13 @@
 {
     public class AppSettings
     {
-        public ProcessingSettings ProcessingSettings { get; }
-        public GeneratorSettings GeneratorSettings { get; }
+        public ProcessingSettings ProcessingSettings { set; get; }
+        public GeneratorSettings GeneratorSettings { set; get; }
+
+        public AppSettings()
+        {
+
+        }
 
         public AppSettings(ProcessingSettings processingSettings, GeneratorSettings generatorSettings)
         {

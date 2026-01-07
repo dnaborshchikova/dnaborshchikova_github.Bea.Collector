@@ -2,6 +2,7 @@
 using dnaborshchikova_github.Bea.Collector.Core.Models;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Processor.Services;
+using dnaborshchikova_github.Bea.Collector.Tests.Processor.Builders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -19,26 +20,6 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
         {
             return new EventProcessorService(processor, parcer, appSettings, logger);
         }
-
-        private static AppSettings CreateAppSettings(int threadCount)
-        {
-            var processingSettings = new ProcessingSettings
-            {
-                GeneratorRunAsProcess = false,
-                GenerateFile = false,
-                FilePath = "C:\\13.12.2025_BillEvent.csv",
-                ThreadCount = threadCount,
-                ProcessType = "Thread"
-            };
-            var generatorSettings = new GeneratorSettings
-            {
-                FileFormat = "csv",
-                PaidBillEventCount = 700_000,
-                CancelledBillEventCount = 300_000
-            };
-
-            return new AppSettings(processingSettings, generatorSettings);
-        }
         #endregion
 
         [Theory]
@@ -48,12 +29,26 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
         public void Process_ValidBillEvents_CallsParserAndProcessorOnce(int threadCount)
         {
             //Arrange
-            var appSettings = CreateAppSettings(threadCount);
-            var logger = NullLogger<EventProcessorService>.Instance;
+            var appSettings = new AppSettingsBuilder()
+                .WithGeneratorSettings(new GeneratorSettings
+                {
+                    FileFormat = "csv",
+                    PaidBillEventCount = 700_000,
+                    CancelledBillEventCount = 300_000
+                })
+                .WithProcessingSettings(new ProcessingSettings
+                {
+                    GeneratorRunAsProcess = false,
+                    GenerateFile = false,
+                    FilePath = "C:\\13.12.2025_BillEvent.csv",
+                    ThreadCount = threadCount,
+                    ProcessType = "Thread"
+                })
+                .Build();
 
+            var logger = NullLogger<EventProcessorService>.Instance;
             var parserMock = new Mock<IParser>();
-            parserMock
-                .Setup(p => p.Parse(It.IsAny<string>()))
+            parserMock.Setup(p => p.Parse(It.IsAny<string>()))
                 .Returns(new List<BillEvent>
                 {
                     new BillEvent { OperationDateTime = new DateTime(2024, 1, 2) },
@@ -65,7 +60,7 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
             processorFactoryMock.Setup(f => f("Thread")).Returns(processorMock.Object);
 
             var service = CreateSut(processorFactoryMock.Object, parserMock.Object, appSettings, logger);
-           
+
             //Act
             service.Process();
 
