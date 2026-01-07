@@ -73,7 +73,7 @@ using (var scope = host.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
     var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
-    //databaseInitializer.CreateDatabase();
+    databaseInitializer.CreateDatabase();
 }
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
