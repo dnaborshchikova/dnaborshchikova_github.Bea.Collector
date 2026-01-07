@@ -2,6 +2,7 @@
 using dnaborshchikova_github.Bea.Collector.Core.Models;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using Microsoft.Extensions.Logging;
+using System.Data;
 using System.Diagnostics;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
@@ -10,13 +11,13 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
     {
         private readonly AppSettings _appSettings;
         private readonly Func<string, IProcessor> _processor;
-        private readonly IParcer _parcer;
+        private readonly IParser _parser;
         private readonly ILogger<EventProcessorService> _logger;
 
-        public EventProcessorService(Func<string, IProcessor> processor, IParcer parcer
+        public EventProcessorService(Func<string, IProcessor> processor, IParser parser
             , AppSettings appSettings, ILogger<EventProcessorService> logger)
         {
-            _parcer = parcer;
+            _parser = parser;
             _processor = processor;
             _appSettings = appSettings;
             _logger = logger;
@@ -31,13 +32,23 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
             var filePath = _appSettings.ProcessingSettings.FilePath;
             _logger.LogInformation($"Parse file. File path: {filePath}");
 
-            var billEvents = _parcer.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();
-            var ranges = GenerateParts(billEvents, _appSettings.ProcessingSettings.ThreadCount);
-            var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
-            processor.Process(ranges);
-
-            stopwatch.Stop();
-            _logger.LogInformation($"End processing {DateTime.Now}. Total processing time: {stopwatch.ElapsedMilliseconds} ms.");
+            try
+            {
+                var billEvents = _parser.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();
+                var ranges = GenerateParts(billEvents, _appSettings.ProcessingSettings.ThreadCount);
+                var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
+                processor.Process(ranges);
+            }
+            catch (Exception ex)
+            {
+                throw new ProcessingException("Error process file.", ex);
+            }
+            finally
+            {
+                stopwatch.Stop();
+                _logger.LogInformation($"End processing {DateTime.Now}." +
+                    $"Total processing time: {stopwatch.ElapsedMilliseconds} ms.");
+            }
         }
 
         public List<EventProcessRange> GenerateParts(List<BillEvent> billEvents, int threadCount)
@@ -63,7 +74,8 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 
                 var range = new EventProcessRange(i + 1, events);
                 eventRanges.Add(range);
-                _logger.LogInformation($"Generate event range end. Range id: {range.Id}. Events count: {events.Count}.");
+                _logger.LogInformation($"Generate event range end. Range id: {range.Id}." +
+                    $"Events count: {events.Count}.");
             }
 
             _logger.LogInformation($"End generate event ranges.");

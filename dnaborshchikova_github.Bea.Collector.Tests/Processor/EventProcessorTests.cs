@@ -15,7 +15,7 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
         #region helpers
 
         private EventProcessorService CreateSut(Func<string, IProcessor> processor = null
-            , IParcer parcer = null, AppSettings appSettings = null
+            , IParser parcer = null, AppSettings appSettings = null
             , ILogger<EventProcessorService> logger = null)
         {
             return new EventProcessorService(processor, parcer, appSettings, logger);
@@ -52,7 +52,7 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
             var appSettings = CreateAppSettings(threadCount);
             var logger = NullLogger<EventProcessorService>.Instance;
 
-            var parserMock = new Mock<IParcer>();
+            var parserMock = new Mock<IParser>();
             parserMock
                 .Setup(p => p.Parse(It.IsAny<string>()))
                 .Returns(new List<BillEvent>
