@@ -23,7 +23,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
         public void Send(EventProcessRange range)
         {
             _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
-                $"Thread id: {Thread.CurrentThread.ManagedThreadId}."); //Thread на тасках
+                $"Thread id: {Thread.CurrentThread.ManagedThreadId}.");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -73,7 +73,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
         public async Task SendAsync(EventProcessRange range)
         {
             _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
-               $"Thread id: {Thread.CurrentThread.ManagedThreadId}."); //Thread на тасках
+               $"Thread id: {Thread.CurrentThread.ManagedThreadId}.");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 

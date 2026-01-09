@@ -32,8 +32,8 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                 catch (Exception ex)
                 {
                     _logger.LogError($"Error save events. Range id: {range.Id}. " +
-                        $"Task id: {Task.CurrentId}. Error: {ex.Message}");
-                    exceptions.Enqueue((range.Id, Task.CurrentId, ex));
+                        $"Thread id: {Thread.CurrentThread.ManagedThreadId}. Error: {ex.Message}");
+                    exceptions.Enqueue((range.Id, Thread.CurrentThread.ManagedThreadId, ex));
                 }
             }
             await Task.WhenAll(tasks);
@@ -43,7 +43,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                 foreach (var (rangeId, threadId, ex) in exceptions)
                 {
                     _logger.LogError(ex, $"Подробная информация об ошибке в " +
-                        $"TaskId={Task.CurrentId} при обработке RangeId={rangeId}");
+                        $"Thread Id={Thread.CurrentThread.ManagedThreadId} при обработке RangeId={rangeId}");
                 }
             }
         }
