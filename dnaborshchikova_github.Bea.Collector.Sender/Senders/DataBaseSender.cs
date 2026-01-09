@@ -2,6 +2,7 @@
 using dnaborshchikova_github.Bea.Collector.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics;
 using System.Text.Json;
 
@@ -22,7 +23,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
         public void Send(EventProcessRange range)
         {
             _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
-                $"Thread id: {Thread.CurrentThread.ManagedThreadId}.");
+                $"Thread id: {Thread.CurrentThread.ManagedThreadId}."); //Thread на тасках
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -65,7 +66,48 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 
             stopwatch.Stop();
             _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. "
-                + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. " 
+                + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. "
+                + $"Work time: {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        public async Task SendAsync(EventProcessRange range)
+        {
+            _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
+               $"Thread id: {Thread.CurrentThread.ManagedThreadId}."); //Thread на тасках
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            var batchSize = 5000;
+            var count = 0;
+            using var dbContext = _contextFactory.CreateDbContext();
+            dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+
+            foreach (var billEvent in range.BillEvents)
+            {
+                var billData = billEvent switch
+                {
+                    PaidBillEvent paid => JsonSerializer.Serialize(paid),
+                    CancelledBillEvent cancelled => JsonSerializer.Serialize(cancelled)
+                };
+                var utcTime = DateTime.SpecifyKind(billEvent.OperationDateTime, DateTimeKind.Utc);
+
+                var sendEvent = new SendEvent(billEvent.Id, utcTime,
+                    billEvent.UserId, billEvent.EventType, billData);
+
+                dbContext.SendEvents.Add(sendEvent);
+                count++;
+
+                if (count % batchSize == 0)
+                {
+                    await dbContext.SaveChangesAsync();
+                    dbContext.ChangeTracker.Clear();
+                }
+            }
+            await dbContext.SaveChangesAsync();
+
+            stopwatch.Stop();
+            _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. "
+                + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. "
                 + $"Work time: {stopwatch.ElapsedMilliseconds} ms.");
         }
     }

@@ -17,7 +17,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             _logger = logger;
         }
 
-        public void Process(List<EventProcessRange> ranges)
+        public async Task ProcessAsync(List<EventProcessRange> ranges)
         {
             using var countdown = new CountdownEvent(ranges.Count);
             var exceptions = new ConcurrentQueue<(int rangeId, int threadId, Exception ex)>();
