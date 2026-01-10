@@ -22,7 +22,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
             _logger = logger;
         }
 
-        public void Process()
+        public async Task ProcessAsync()
         {
             _logger.LogInformation($"Start processing {DateTime.Now}.");
             var stopwatch = new Stopwatch();
@@ -34,7 +34,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
             var billEvents = _parcer.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();
             var ranges = GenerateParts(billEvents, _appSettings.ProcessingSettings.ThreadCount);
             var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
-            processor.Process(ranges);
+            await processor.ProcessAsync(ranges);
 
             stopwatch.Stop();
             _logger.LogInformation($"End processing {DateTime.Now}. Total processing time: {stopwatch.ElapsedMilliseconds} ms.");

@@ -9,6 +9,6 @@ namespace dnaborshchikova_github.Bea.Collector.Core.Interfaces
 {
     public interface IProcessor
     {
-        public void Process(List<EventProcessRange> ranges);
+        public Task ProcessAsync(List<EventProcessRange> ranges);
     }
 }

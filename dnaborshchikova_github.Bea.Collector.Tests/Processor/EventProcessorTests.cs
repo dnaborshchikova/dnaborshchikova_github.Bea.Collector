@@ -68,12 +68,12 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
             var service = CreateSut(processorFactoryMock.Object, parserMock.Object, appSettings, logger);
            
             //Act
-            service.Process();
+            service.ProcessAsync();
 
             //Assert
             parserMock.Verify(p => p.Parse(appSettings.ProcessingSettings.FilePath), Times.Once);
             processorFactoryMock.Verify(f => f(appSettings.ProcessingSettings.ProcessType), Times.Once);
-            processorMock.Verify(p => p.Process(It.IsAny<List<EventProcessRange>>()), Times.Once);
+            processorMock.Verify(p => p.ProcessAsync(It.IsAny<List<EventProcessRange>>()), Times.Once);
         }
 
         [Theory]

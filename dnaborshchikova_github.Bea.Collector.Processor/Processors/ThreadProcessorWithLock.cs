@@ -18,7 +18,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             _logger = logger;
         }
 
-        public void Process(List<EventProcessRange> ranges)
+        public async Task ProcessAsync(List<EventProcessRange> ranges)
         {
             completedThreads = ranges.Count;
             var exceptions = new List<Exception>();

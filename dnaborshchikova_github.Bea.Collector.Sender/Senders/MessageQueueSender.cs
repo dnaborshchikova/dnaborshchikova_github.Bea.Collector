@@ -52,6 +52,11 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
                 $"Range id {range.Id}. Work time: {stopwatch.ElapsedMilliseconds} ms.");
         }
 
+        public Task SendAsync(EventProcessRange range)
+        {
+            throw new NotImplementedException();
+        }
+
         private SendEvent GetSendEvent(BillEvent billEvent)
         {
             var billData = billEvent switch
