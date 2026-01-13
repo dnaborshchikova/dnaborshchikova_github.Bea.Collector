@@ -1,8 +1,8 @@
 ﻿using dnaborshchikova_github.Bea.Collector.App;
 using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
-using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Processors;
+using dnaborshchikova_github.Bea.Collector.Processor.Services;
 using dnaborshchikova_github.Bea.Collector.Sender;
 using dnaborshchikova_github.Bea.Collector.Sender.DbContext;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
@@ -57,7 +57,7 @@ var host = Host.CreateDefaultBuilder()
         //services.AddScoped<IEventSender, MessageQueueSender>();
         services.AddScoped<IEventSender, DataBaseSender>();
         services.AddScoped<ICompositeEventSender, CompositeEventSender>();
-        services.AddScoped<IParcer, CsvParser>();
+        services.AddScoped<IParser, CsvParser>();
         services.AddScoped<IEventProcessor, EventProcessorService>();
         services.AddDbContextFactory<CollectorDbContext>(options =>
         {
@@ -77,7 +77,15 @@ using (var scope = host.Services.CreateScope())
 }
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
-eventProcessor.Process();
+var logger = host.Services.GetService<ILogger<Program>>();
+try
+{
+    eventProcessor.Process();
+}
+catch (ProcessingException ex)
+{
+    logger.LogError(ex, ex.Message);
+}
 Console.ReadLine();
 
 void RunGenerator()
