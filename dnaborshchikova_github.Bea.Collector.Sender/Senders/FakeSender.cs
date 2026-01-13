@@ -4,13 +4,13 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace dnaborshchikova_github.Bea.Collector.Sender.Senders
+namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 {
-    public class MessageQueueSender : IEventSender
+    public class FakeSender : IEventSender
     {
-        private readonly ILogger<MessageQueueSender> _logger;
+        private readonly ILogger<FakeSender> _logger;
 
-        public MessageQueueSender(ILogger<MessageQueueSender> logger)
+        public FakeSender(ILogger<FakeSender> logger)
         {
             _logger = logger;
         }
