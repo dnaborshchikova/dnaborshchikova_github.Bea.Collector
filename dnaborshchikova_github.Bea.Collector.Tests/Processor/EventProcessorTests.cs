@@ -29,21 +29,17 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
         public void Process_ValidBillEvents_CallsParserAndProcessorOnce(int threadCount)
         {
             //Arrange
+            var generatorSettings = GeneratorSettingsBuilder.Default()
+                .Build();
+
+            var processingSettings = ProcessingSettingsBuilder.Default()
+                .WithThreadCount(threadCount)
+                .WithProcessType("Thread")
+                .Build();
+
             var appSettings = new AppSettingsBuilder()
-                .WithGeneratorSettings(new GeneratorSettings
-                {
-                    FileFormat = "csv",
-                    PaidBillEventCount = 700_000,
-                    CancelledBillEventCount = 300_000
-                })
-                .WithProcessingSettings(new ProcessingSettings
-                {
-                    GeneratorRunAsProcess = false,
-                    GenerateFile = false,
-                    FilePath = "C:\\13.12.2025_BillEvent.csv",
-                    ThreadCount = threadCount,
-                    ProcessType = "Thread"
-                })
+                .WithGeneratorSettings(generatorSettings)
+                .WithProcessingSettings(processingSettings)
                 .Build();
 
             var logger = NullLogger<EventProcessorService>.Instance;
