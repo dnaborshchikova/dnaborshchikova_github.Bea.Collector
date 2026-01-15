@@ -1,4 +1,3 @@
-ï»¿using dnaborshchikova_github.Bea.Collector.App;
 using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Core.Services;
@@ -10,23 +9,20 @@ using dnaborshchikova_github.Bea.Collector.Sender.DbContext;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
 using dnaborshchikova_github.Bea.Generator;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Filters;
 using System.Diagnostics;
+using WorkerService;
 
-var config = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json")
-    .Build();
+var builder = Host.CreateApplicationBuilder(args);
+var config = builder.Configuration;
+
 var generatorSettings = config.GetSection(nameof(GeneratorSettings)).Get<GeneratorSettings>();
 var processingSettings = config.GetSection(nameof(ProcessingSettings)).Get<ProcessingSettings>();
 var appSettingsService = new AppSettingsService();
 var appSettings = appSettingsService.CreateAppSettings(generatorSettings, processingSettings);
 
-#region Ð—Ð°Ð¿ÑƒÑÐº Ð³ÐµÐ½ÐµÑ€Ð°Ñ‚Ð¾Ñ€Ð°
+#region Çàïóñê ãåíåðàòîðà
 RunGenerator();
 #endregion
 
@@ -36,52 +32,36 @@ Log.Logger = new LoggerConfiguration()
     .Filter.ByExcluding(Matching.FromSource("Microsoft.EntityFrameworkCore.Update"))
     .Filter.ByExcluding(Matching.FromSource("Microsoft.EntityFrameworkCore.ChangeTracking"))
     .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog();
 
-var host = Host.CreateDefaultBuilder()
-     .ConfigureLogging(logging =>
-     {
-         logging.ClearProviders();
-     })
-    .ConfigureServices(services =>
-    {
-        services.AddSingleton(appSettings);
-        services.AddScoped<DatabaseInitializer>();
-        services.AddScoped<ThreadProcessorWithLock>();
-        services.AddScoped<ThreadProcessor>();
-        services.AddScoped<TaskProcessor>();
-        services.AddScoped<Func<string, IProcessor>>(provider => key =>
-        {
-            return key switch
-            {
-                //"Thread" => provider.GetRequiredService<ThreadProcessorWithLock>(),
-                "Thread" => provider.GetRequiredService<ThreadProcessor>(),
-                "Task" => provider.GetRequiredService<TaskProcessor>()
-            };
-        });
-        //services.AddScoped<IEventSender, MessageQueueSender>();
-        services.AddScoped<IEventSender, DataBaseSender>();
-        services.AddScoped<ICompositeEventSender, CompositeEventSender>();
-        services.AddScoped<IParser, CsvParser>();
-        services.AddScoped<IEventProcessor, EventProcessorService>();
-        services.AddDbContextFactory<CollectorDbContext>(options =>
-        {
-            options.UseNpgsql(config.GetConnectionString("Default"));
-        });
-        services.AddDbContext<CollectorDbContext>(options =>
-            options.UseNpgsql(config.GetConnectionString("Default")));
-    })
-    .UseSerilog()
-    .Build();
-
-using (var scope = host.Services.CreateScope())
+builder.Services.AddHostedService<Worker>();
+builder.Services.AddSingleton(appSettings);
+builder.Services.AddScoped<DatabaseInitializer>();
+builder.Services.AddScoped<ThreadProcessor>();
+builder.Services.AddScoped<TaskProcessor>();
+builder.Services.AddScoped<Func<string, IProcessor>>(provider => key =>
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
-    var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
-    databaseInitializer.CreateDatabase();
-}
-
-var eventProcessor = host.Services.GetService<IEventProcessor>();
-await eventProcessor.ProcessAsync();
+    return key switch
+    {
+        "Thread" => provider.GetRequiredService<ThreadProcessor>(),
+        "Task" => provider.GetRequiredService<TaskProcessor>()
+    };
+});
+builder.Services.AddScoped<IEventSender, DataBaseSender>();
+builder.Services.AddScoped<ICompositeEventSender, CompositeEventSender>();
+builder.Services.AddScoped<IParser, CsvParser>();
+builder.Services.AddScoped<IEventProcessor, EventProcessorService>();
+builder.Services.AddDbContextFactory<CollectorDbContext>(options =>
+{
+    options.UseNpgsql(config.GetConnectionString("Default"));
+});
+builder.Services.AddDbContext<CollectorDbContext>(options =>
+{
+    options.UseNpgsql(config.GetConnectionString("Default"));
+});
+var host = builder.Build();
+host.Run();
 
 void RunGenerator()
 {
