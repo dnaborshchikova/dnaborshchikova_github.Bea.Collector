@@ -2,7 +2,6 @@
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Data;
 using System.Diagnostics;
 
@@ -22,6 +21,15 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
             _processor = processor;
             _appSettings = appSettings;
             _logger = logger;
+        }
+
+        public async Task ProcessAsync(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await ProcessAsync();
+                await Task.Delay(1000, cancellationToken);
+            }
         }
 
         public async Task ProcessAsync()
