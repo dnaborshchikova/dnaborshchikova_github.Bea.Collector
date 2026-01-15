@@ -8,6 +8,7 @@ namespace dnaborshchikova_github.Bea.Collector.Core.Interfaces
 {
     public interface IEventProcessor
     {
-        public void Process();
+        public Task ProcessAsync();
+        public Task ProcessAsync(CancellationToken cancellationToken);
     }
 }
