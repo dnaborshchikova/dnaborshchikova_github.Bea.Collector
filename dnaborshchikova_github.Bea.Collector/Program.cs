@@ -1,7 +1,5 @@
 ﻿using dnaborshchikova_github.Bea.Collector.App;
 using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
-using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
-using dnaborshchikova_github.Bea.Collector.Core.Services;
 using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Processors;
 using dnaborshchikova_github.Bea.Collector.Processor.Services;
@@ -21,10 +19,8 @@ using System.Diagnostics;
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
-var generatorSettings = config.GetSection(nameof(GeneratorSettings)).Get<GeneratorSettings>();
-var processingSettings = config.GetSection(nameof(ProcessingSettings)).Get<ProcessingSettings>();
-var appSettingsService = new AppSettingsService();
-var appSettings = appSettingsService.CreateAppSettings(generatorSettings, processingSettings);
+var validator = new AppSettingsService(config);
+var appSettings = validator.CreateAppSettings();
 
 #region Запуск генератора
 RunGenerator();
@@ -81,7 +77,8 @@ using (var scope = host.Services.CreateScope())
 }
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
-await eventProcessor.ProcessAsync();
+eventProcessor.ProcessAsync();
+Console.ReadLine();
 
 void RunGenerator()
 {
