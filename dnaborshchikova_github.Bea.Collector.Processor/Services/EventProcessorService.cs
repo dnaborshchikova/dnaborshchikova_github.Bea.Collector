@@ -2,7 +2,6 @@
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Data;
 using System.Diagnostics;
 
