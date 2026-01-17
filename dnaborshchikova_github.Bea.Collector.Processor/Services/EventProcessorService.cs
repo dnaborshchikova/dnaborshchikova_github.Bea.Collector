@@ -2,7 +2,6 @@
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Data;
 using System.Diagnostics;
 
@@ -24,7 +23,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
             _logger = logger;
         }
 
-        public void Process()
+        public async Task ProcessAsync()
         {
             _logger.LogInformation($"Start processing {DateTime.Now}.");
             var stopwatch = new Stopwatch();
@@ -43,7 +42,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
                 _logger.LogInformation($"End generate event ranges.");
 
                 var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
-                processor.Process(ranges);
+                await processor.ProcessAsync(ranges);
             }
             catch (Exception ex)
             {

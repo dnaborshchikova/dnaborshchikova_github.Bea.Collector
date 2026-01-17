@@ -77,15 +77,7 @@ using (var scope = host.Services.CreateScope())
 }
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
-var logger = host.Services.GetService<ILogger<Program>>();
-try
-{
-    eventProcessor.Process();
-}
-catch (ProcessingException ex)
-{
-    logger.LogError(ex, ex.Message);
-}
+eventProcessor.ProcessAsync();
 Console.ReadLine();
 
 void RunGenerator()
