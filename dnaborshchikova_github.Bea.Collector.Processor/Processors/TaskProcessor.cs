@@ -16,13 +16,15 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             _logger = logger;
         }
 
-        public async Task ProcessAsync(List<EventProcessRange> ranges)
+        public async Task<SendEvent?> ProcessAsync(List<EventProcessRange> ranges)
         {
+            var sendEvents = new List<SendEvent>();
             var tasks = ranges.Select(async range =>
             {
                 try
                 {
-                    await _compositeEventSender.SendAsync(range);
+                    var lastSendEvent = await _compositeEventSender.SendAsync(range);
+                    sendEvents.Add(lastSendEvent);
                 }
                 catch (Exception ex)
                 {
@@ -30,8 +32,12 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                     $"Task Id={Task.CurrentId} при обработке RangeId={range.Id}");
                 }
             });
-
             await Task.WhenAll(tasks);
+            var lastSendEvent = sendEvents
+                .OrderByDescending(e => e.Date)
+                .FirstOrDefault();
+
+            return lastSendEvent;
         }
     }
 }

@@ -8,6 +8,11 @@
         public string EventType { get; set; }
         public string Data { get; set; }
 
+        public SendEvent()
+        {
+
+        }
+
         public SendEvent(Guid id, DateTime date, Guid userId, string eventType, string data)
         {
             this.Id = id;

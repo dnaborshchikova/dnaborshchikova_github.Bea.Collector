@@ -18,7 +18,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             _logger = logger;
         }
 
-        public async Task ProcessAsync(List<EventProcessRange> ranges)
+        public async Task<SendEvent?> ProcessAsync(List<EventProcessRange> ranges)
         {
             completedThreads = ranges.Count;
             var exceptions = new List<Exception>();
@@ -42,6 +42,8 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                 _logger.LogInformation($"При обработке данных возникли ошибки:\n" +
                     $"{string.Join(";\n", exceptions)}");
             }
+
+            return new SendEvent(); //TODO сохранять реальное событие
         }
 
         private void ProcessRange(EventProcessRange range, List<Exception> exceptions)

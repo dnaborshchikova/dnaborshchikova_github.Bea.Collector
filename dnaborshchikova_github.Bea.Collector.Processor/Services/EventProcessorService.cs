@@ -1,4 +1,5 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
+using dnaborshchikova_github.Bea.Collector.Core.Models;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using Microsoft.Extensions.Logging;
@@ -13,14 +14,17 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
         private readonly Func<string, IProcessor> _processor;
         private readonly IParser _parser;
         private readonly ILogger<EventProcessorService> _logger;
+        private readonly IEventReadCheckpointRepository _eventReadCheckpointRepository;
 
         public EventProcessorService(Func<string, IProcessor> processor, IParser parser
-            , AppSettings appSettings, ILogger<EventProcessorService> logger)
+            , AppSettings appSettings, ILogger<EventProcessorService> logger
+            , IEventReadCheckpointRepository eventReadCheckpointRepository)
         {
             _parser = parser;
             _processor = processor;
             _appSettings = appSettings;
             _logger = logger;
+            _eventReadCheckpointRepository = eventReadCheckpointRepository;
         }
 
         public async Task ProcessAsync(CancellationToken cancellationToken)
@@ -51,7 +55,10 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
                 _logger.LogInformation($"End generate event ranges.");
 
                 var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
-                await processor.ProcessAsync(ranges);
+                var lastSendEvent = await processor.ProcessAsync(ranges);
+                var eventReadCheckpoint = new EventReadCheckpoint(Path.GetFileName(filePath), lastSendEvent.Id
+                    , DateTime.Now);
+                _eventReadCheckpointRepository.SetLastEventReadCheckpoint(eventReadCheckpoint);
             }
             catch (Exception ex)
             {

@@ -15,7 +15,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
             _logger = logger;
         }
 
-        public void Send(EventProcessRange range)
+        public SendEvent Send(EventProcessRange range)
         {
             _logger.LogInformation($"Start send {DateTime.Now}. Thread id {Thread.CurrentThread.ManagedThreadId}." +
                 $"Range id {range.Id}.");
@@ -50,9 +50,11 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
             stopwatch.Stop();
             _logger.LogInformation($"End send {DateTime.Now}. Thread id {Thread.CurrentThread.ManagedThreadId}." +
                 $"Range id {range.Id}. Work time: {stopwatch.ElapsedMilliseconds} ms.");
+
+            return new SendEvent();//TODO сохранять реальное событие
         }
 
-        public Task SendAsync(EventProcessRange range)
+        public Task<SendEvent> SendAsync(EventProcessRange range)
         {
             throw new NotImplementedException();
         }

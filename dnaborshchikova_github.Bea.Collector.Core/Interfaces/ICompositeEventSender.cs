@@ -1,15 +1,10 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace dnaborshchikova_github.Bea.Collector.Core.Interfaces
 {
     public interface ICompositeEventSender
     {
-        void Send(EventProcessRange range);
-        Task SendAsync(EventProcessRange range);
+        SendEvent Send(EventProcessRange range);
+        Task<SendEvent> SendAsync(EventProcessRange range);
     }
 }

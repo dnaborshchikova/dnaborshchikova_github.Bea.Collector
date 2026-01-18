@@ -20,15 +20,13 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
             _contextFactory = contextFactory;
         }
 
-        public void Send(EventProcessRange range)
+        public SendEvent Send(EventProcessRange range)
         {
             _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
                 $"Thread id: {Thread.CurrentThread.ManagedThreadId}.");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            var batchSize = 5000;
-            var count = 0;
+            SendEvent lastEvent = null;
             using var dbContext = _contextFactory.CreateDbContext();
             dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
             using var transaction = dbContext.Database.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
@@ -47,12 +45,11 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
                         billEvent.UserId, billEvent.EventType, billData);
 
                     dbContext.SendEvents.Add(sendEvent);
-                    count++;
+                    dbContext.SaveChanges();
 
-                    if (count % batchSize == 0)
+                    if (lastEvent == null || sendEvent.Date > lastEvent.Date)
                     {
-                        dbContext.SaveChanges();
-                        dbContext.ChangeTracker.Clear();
+                        lastEvent = sendEvent;
                     }
                 }
                 dbContext.SaveChanges();
@@ -68,20 +65,18 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
             _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. "
                 + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. "
                 + $"Work time: {stopwatch.ElapsedMilliseconds} ms.");
+            return lastEvent;
         }
 
-        public async Task SendAsync(EventProcessRange range)
+        public async Task<SendEvent> SendAsync(EventProcessRange range)
         {
             _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
                $"Thread id: {Thread.CurrentThread.ManagedThreadId}.");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            var batchSize = 5000;
-            var count = 0;
             using var dbContext = _contextFactory.CreateDbContext();
             dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
-
+            SendEvent lastEvent = null;
             foreach (var billEvent in range.BillEvents)
             {
                 var billData = billEvent switch
@@ -95,12 +90,12 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
                     billEvent.UserId, billEvent.EventType, billData);
 
                 dbContext.SendEvents.Add(sendEvent);
-                count++;
+                await dbContext.SaveChangesAsync();
+                dbContext.ChangeTracker.Clear();
 
-                if (count % batchSize == 0)
+                if (lastEvent == null || sendEvent.Date > lastEvent.Date)
                 {
-                    await dbContext.SaveChangesAsync();
-                    dbContext.ChangeTracker.Clear();
+                    lastEvent = sendEvent;
                 }
             }
             await dbContext.SaveChangesAsync();
@@ -109,6 +104,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
             _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. "
                 + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. "
                 + $"Work time: {stopwatch.ElapsedMilliseconds} ms.");
+            return lastEvent;
         }
     }
 }
