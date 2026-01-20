@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Text.Json;
+using EFCore.BulkExtensions;
 
 namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 {
@@ -65,7 +66,41 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 
             stopwatch.Stop();
             _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. "
-                + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. " 
+                + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. "
+                + $"Work time: {stopwatch.ElapsedMilliseconds} ms.");
+        }
+
+        public async Task SendAsync(EventProcessRange range)
+        {
+            _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
+               $"Thread id: {Thread.CurrentThread.ManagedThreadId}.");
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            using var dbContext = _contextFactory.CreateDbContext();
+            dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+            var sendEvents = range.BillEvents.Select(e =>
+            {
+                var billData = e switch
+                {
+                    PaidBillEvent paid => JsonSerializer.Serialize(paid),
+                    CancelledBillEvent cancelled => JsonSerializer.Serialize(cancelled)
+                };
+                var utcTime = DateTime.SpecifyKind(e.OperationDateTime, DateTimeKind.Utc);
+
+                return new SendEvent(e.Id, utcTime, e.UserId, e.EventType, billData);
+            });
+            await dbContext.BulkInsertAsync(sendEvents, new BulkConfig
+            {
+                BatchSize = 50000, 
+                UseTempDB = true,
+                PreserveInsertOrder = false,
+                SetOutputIdentity = false,
+                BulkCopyTimeout = 0
+            });
+            stopwatch.Stop();
+
+            _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. "
+                + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. "
                 + $"Work time: {stopwatch.ElapsedMilliseconds} ms.");
         }
     }

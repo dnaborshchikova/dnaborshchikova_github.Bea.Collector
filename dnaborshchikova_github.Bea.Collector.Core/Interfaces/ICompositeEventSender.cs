@@ -10,5 +10,6 @@ namespace dnaborshchikova_github.Bea.Collector.Core.Interfaces
     public interface ICompositeEventSender
     {
         void Send(EventProcessRange range);
+        Task SendAsync(EventProcessRange range);
     }
 }

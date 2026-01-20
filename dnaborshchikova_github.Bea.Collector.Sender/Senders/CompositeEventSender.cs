@@ -19,5 +19,12 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
                 sender.Send(range);
             }
         }
+
+        public async Task SendAsync(EventProcessRange range)
+        {
+            var tasks = _senders.Select(sender => sender.SendAsync(range)).ToList();
+
+            await Task.WhenAll(tasks);
+        }
     }
 }
