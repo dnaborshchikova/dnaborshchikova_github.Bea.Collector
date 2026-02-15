@@ -27,7 +27,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             {
                 try
                 {
-                    //if (range.Id == 2)
+                    //if (range.Id == 2) //TODO: удалить перед завершением PR по BackgroundTask
                     //    throw new Exception("Диапазон номер 2");
                     await _compositeEventSender.SendAsync(range);
                 }
@@ -46,7 +46,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
         private void SaveSendResult(bool isSendCompleted, ProcessingContext processingContext)
         {
             var utcRunDateTime = DateTime.SpecifyKind(processingContext.RunDateTime, DateTimeKind.Utc);
-            var fileName = Path.GetFileName(processingContext.FileName); //todo проверить намиенование файла
+            var fileName = Path.GetFileName(processingContext.FileName);
             var workerServiceSendLog = new WorkerServiceSendLog(fileName, utcRunDateTime
                 , processingContext.RunSettings, isSendCompleted);
             _workerServiceLogRepository.SaveSendResult(workerServiceSendLog);
