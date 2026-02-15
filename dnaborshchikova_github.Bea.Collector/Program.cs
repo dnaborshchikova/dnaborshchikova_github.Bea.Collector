@@ -1,5 +1,4 @@
-﻿using dnaborshchikova_github.Bea.Collector.App;
-using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
+﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Core.Services;
 using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
@@ -8,6 +7,8 @@ using dnaborshchikova_github.Bea.Collector.Processor.Services;
 using dnaborshchikova_github.Bea.Collector.Sender;
 using dnaborshchikova_github.Bea.Collector.Sender.DbContext;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
+using dnaborshchikova_github.Bea.Collector.Sender.Repositories;
+using dnaborshchikova_github.Bea.Collector.Sender.Repositories.Interfaces;
 using dnaborshchikova_github.Bea.Generator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -62,6 +63,7 @@ var host = Host.CreateDefaultBuilder()
         services.AddScoped<IEventSender, DataBaseSender>();
         services.AddScoped<ICompositeEventSender, CompositeEventSender>();
         services.AddScoped<IParser, CsvParser>();
+        services.AddScoped<IWorkerServiceLogRepository, WorkerServiceLogRepository>();
         services.AddScoped<IEventProcessor, EventProcessorService>();
         services.AddDbContextFactory<CollectorDbContext>(options =>
         {

@@ -20,6 +20,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
             _contextFactory = contextFactory;
         }
 
+        [Obsolete("This method is obsolete. Call SendAsync instead.")]
         public void Send(EventProcessRange range)
         {
             _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +
@@ -31,7 +32,6 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
             var count = 0;
             using var dbContext = _contextFactory.CreateDbContext();
             dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
-            using var transaction = dbContext.Database.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
             try
             {
                 foreach (var billEvent in range.BillEvents)
@@ -56,11 +56,9 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
                     }
                 }
                 dbContext.SaveChanges();
-                transaction.Commit();
             }
             catch (Exception ex)
             {
-                transaction.Rollback();
                 throw;
             }
 
@@ -76,8 +74,10 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
                $"Thread id: {Thread.CurrentThread.ManagedThreadId}.");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
+
             using var dbContext = _contextFactory.CreateDbContext();
             dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+
             var sendEvents = range.BillEvents.Select(e =>
             {
                 var billData = e switch
@@ -89,16 +89,17 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 
                 return new SendEvent(e.Id, utcTime, e.UserId, e.EventType, billData);
             });
-            await dbContext.BulkInsertAsync(sendEvents, new BulkConfig
+            await dbContext.BulkInsertOrUpdateAsync(sendEvents, new BulkConfig
             {
                 BatchSize = 50000, 
-                UseTempDB = true,
                 PreserveInsertOrder = false,
                 SetOutputIdentity = false,
-                BulkCopyTimeout = 0
+                BulkCopyTimeout = 0,
+                UpdateByProperties = new List<string> { "Id" },
+                PropertiesToIncludeOnUpdate = new List<string>()
             });
-            stopwatch.Stop();
 
+            stopwatch.Stop();
             _logger.LogInformation($"End save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. "
                 + $"Thread id: {Thread.CurrentThread.ManagedThreadId}. "
                 + $"Work time: {stopwatch.ElapsedMilliseconds} ms.");

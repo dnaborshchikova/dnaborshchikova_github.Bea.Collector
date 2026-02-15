@@ -2,11 +2,13 @@
 using dnaborshchikova_github.Bea.Collector.Core.Models;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Processor.Services;
+using dnaborshchikova_github.Bea.Collector.Sender.Repositories.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Tests.Processor.Builders;
 using dnaborshchikova_github.Bea.Collector.Tests.Processor.Factories;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
@@ -17,9 +19,9 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
 
         private EventProcessorService CreateSut(Func<string, IProcessor> processor = null
             , IParser parcer = null, AppSettings appSettings = null
-            , ILogger<EventProcessorService> logger = null)
+            , ILogger<EventProcessorService> logger = null, IWorkerServiceLogRepository workerServiceLogRepository = null)
         {
-            return new EventProcessorService(processor, parcer, appSettings, logger);
+            return new EventProcessorService(processor, parcer, appSettings, logger, workerServiceLogRepository);
         }
         #endregion
 
@@ -46,6 +48,12 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
                 .WithProcessingSettings(processingSettings)
                 .Build();
 
+            var processingContext = new ProcessingContext(
+                fileName: appSettings.ProcessingSettings.FilePath,
+                runDateTime: DateTime.Now,
+                runSettings: JsonConvert.SerializeObject(appSettings.ProcessingSettings)
+            );
+
             var logger = NullLogger<EventProcessorService>.Instance;
             var parserMock = new Mock<IParser>();
             parserMock.Setup(p => p.Parse(It.IsAny<string>()))
@@ -67,7 +75,7 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
             //Assert
             parserMock.Verify(p => p.Parse(appSettings.ProcessingSettings.FilePath), Times.Once);
             processorFactoryMock.Verify(f => f(appSettings.ProcessingSettings.ProcessType), Times.Once);
-            processorMock.Verify(p => p.ProcessAsync(It.IsAny<List<EventProcessRange>>()), Times.Once);
+            processorMock.Verify(p => p.ProcessAsync(It.IsAny<List<EventProcessRange>>(), processingContext), Times.Once);
         }
     }
 }

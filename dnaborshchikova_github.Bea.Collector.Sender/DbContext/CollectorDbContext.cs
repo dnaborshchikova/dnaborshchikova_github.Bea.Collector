@@ -11,6 +11,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender
         }
 
         public DbSet<SendEvent> SendEvents { get; set; }
+        public DbSet<WorkerServiceSendLog> WorkerServiceSendLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

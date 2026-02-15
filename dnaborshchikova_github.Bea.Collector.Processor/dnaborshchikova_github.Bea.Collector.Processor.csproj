@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Core\dnaborshchikova_github.Bea.Collector.Core.csproj" />
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Sender\dnaborshchikova_github.Bea.Collector.Sender.csproj" />
   </ItemGroup>
 
   <ItemGroup>

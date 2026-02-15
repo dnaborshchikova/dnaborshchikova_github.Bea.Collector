@@ -1,5 +1,7 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
+using dnaborshchikova_github.Bea.Collector.Sender.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
@@ -8,30 +10,46 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
     {
         private readonly ICompositeEventSender _compositeEventSender;
         private readonly ILogger<TaskProcessor> _logger;
+        private readonly IWorkerServiceLogRepository _workerServiceLogRepository;
 
         public TaskProcessor(ICompositeEventSender compositeEventSender
-            , ILogger<TaskProcessor> logger)
+            , ILogger<TaskProcessor> logger, IWorkerServiceLogRepository workerServiceLogRepository)
         {
             _compositeEventSender = compositeEventSender;
             _logger = logger;
+            _workerServiceLogRepository = workerServiceLogRepository;
         }
 
-        public async Task ProcessAsync(List<EventProcessRange> ranges)
+        public async Task ProcessAsync(List<EventProcessRange> ranges, ProcessingContext processingContext)
         {
+            var isSendCompleted = true;
             var tasks = ranges.Select(async range =>
             {
                 try
                 {
+                    //if (range.Id == 2)
+                    //    throw new Exception("Диапазон номер 2");
                     await _compositeEventSender.SendAsync(range);
                 }
                 catch (Exception ex)
                 {
+                    isSendCompleted = false;
                     _logger.LogError(ex, $"Информация об ошибке в " +
                     $"Task Id={Task.CurrentId} при обработке RangeId={range.Id}");
                 }
             });
 
             await Task.WhenAll(tasks);
+            SaveSendResult(isSendCompleted, processingContext);
+        }
+
+        private void SaveSendResult(bool isSendCompleted, ProcessingContext processingContext)
+        {
+            var utcRunDateTime = DateTime.SpecifyKind(processingContext.RunDateTime, DateTimeKind.Utc);
+            var fileName = Path.GetFileName(processingContext.FileName); //todo проверить намиенование файла
+            var workerServiceSendLog = new WorkerServiceSendLog(fileName, utcRunDateTime
+                , processingContext.RunSettings, isSendCompleted);
+            _workerServiceLogRepository.SaveSendResult(workerServiceSendLog);
         }
     }
 }
