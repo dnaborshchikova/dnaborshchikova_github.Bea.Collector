@@ -1,4 +1,5 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace dnaborshchikova_github.Bea.Collector.Core.Interfaces
 {
     public interface IProcessor
     {
-        public Task ProcessAsync(List<EventProcessRange> ranges);
+        public Task ProcessAsync(List<EventProcessRange> ranges, ProcessingContext processingContext);
     }
 }

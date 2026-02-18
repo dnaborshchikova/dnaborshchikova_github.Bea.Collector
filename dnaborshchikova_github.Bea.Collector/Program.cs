@@ -1,10 +1,13 @@
-﻿using dnaborshchikova_github.Bea.Collector.App;
-using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
+﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
+using dnaborshchikova_github.Bea.Collector.Core.Services;
+using dnaborshchikova_github.Bea.Collector.DataAccess;
+using dnaborshchikova_github.Bea.Collector.DataAccess.DbContext;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Processors;
 using dnaborshchikova_github.Bea.Collector.Processor.Services;
-using dnaborshchikova_github.Bea.Collector.Sender;
-using dnaborshchikova_github.Bea.Collector.Sender.DbContext;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
 using dnaborshchikova_github.Bea.Generator;
 using Microsoft.EntityFrameworkCore;
@@ -19,8 +22,10 @@ using System.Diagnostics;
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
-var validator = new AppSettingsService(config);
-var appSettings = validator.CreateAppSettings();
+var generatorSettings = config.GetSection(nameof(GeneratorSettings)).Get<GeneratorSettings>();
+var processingSettings = config.GetSection(nameof(ProcessingSettings)).Get<ProcessingSettings>();
+var appSettingsService = new AppSettingsService();
+var appSettings = appSettingsService.CreateAppSettings(generatorSettings, processingSettings);
 
 #region Запуск генератора
 RunGenerator();
@@ -58,6 +63,7 @@ var host = Host.CreateDefaultBuilder()
         services.AddScoped<IEventSender, DataBaseSender>();
         services.AddScoped<ICompositeEventSender, CompositeEventSender>();
         services.AddScoped<IParser, CsvParser>();
+        services.AddScoped<IWorkerServiceLogRepository, WorkerServiceLogRepository>();
         services.AddScoped<IEventProcessor, EventProcessorService>();
         services.AddDbContextFactory<CollectorDbContext>(options =>
         {
@@ -77,8 +83,7 @@ using (var scope = host.Services.CreateScope())
 }
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
-eventProcessor.ProcessAsync();
-Console.ReadLine();
+await eventProcessor.ProcessAsync();
 
 void RunGenerator()
 {

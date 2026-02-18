@@ -1,5 +1,6 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
@@ -17,7 +18,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             _logger = logger;
         }
 
-        public async Task ProcessAsync(List<EventProcessRange> ranges)
+        public async Task ProcessAsync(List<EventProcessRange> ranges, ProcessingContext processingContext)
         {
             using var countdown = new CountdownEvent(ranges.Count);
             var exceptions = new ConcurrentQueue<(int rangeId, int threadId, Exception ex)>();
