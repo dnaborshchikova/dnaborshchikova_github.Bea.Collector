@@ -1,7 +1,7 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace dnaborshchikova_github.Bea.Collector.Sender
+namespace dnaborshchikova_github.Bea.Collector.DataAccess
 {
     public class CollectorDbContext : Microsoft.EntityFrameworkCore.DbContext
     {

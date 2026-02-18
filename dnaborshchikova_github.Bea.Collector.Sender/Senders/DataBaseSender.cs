@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Text.Json;
 using EFCore.BulkExtensions;
+using dnaborshchikova_github.Bea.Collector.DataAccess;
 
 namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 {

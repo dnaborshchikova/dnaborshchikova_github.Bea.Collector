@@ -1,7 +1,7 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
-using dnaborshchikova_github.Bea.Collector.Sender.Repositories.Interfaces;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
 
-namespace dnaborshchikova_github.Bea.Collector.Sender.Repositories
+namespace dnaborshchikova_github.Bea.Collector.DataAccess.Repositories
 {
     public class WorkerServiceLogRepository : IWorkerServiceLogRepository
     {

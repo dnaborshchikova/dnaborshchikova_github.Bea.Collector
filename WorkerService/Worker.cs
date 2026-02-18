@@ -1,5 +1,5 @@
 using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
-using dnaborshchikova_github.Bea.Collector.Sender;
+using dnaborshchikova_github.Bea.Collector.DataAccess;
 
 namespace WorkerService
 {

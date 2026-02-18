@@ -1,7 +1,7 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
-using dnaborshchikova_github.Bea.Collector.Sender.Repositories.Interfaces;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Processors

@@ -1,6 +1,6 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
 
-namespace dnaborshchikova_github.Bea.Collector.Sender.Repositories.Interfaces
+namespace dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces
 {
     public interface IWorkerServiceLogRepository
     {
