@@ -19,9 +19,9 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
 
         private EventProcessorService CreateSut(Func<string, IProcessor> processor = null
             , IParser parcer = null, AppSettings appSettings = null
-            , ILogger<EventProcessorService> logger = null, IWorkerServiceLogRepository workerServiceLogRepository = null)
+            , ILogger<EventProcessorService> logger = null, IFileSelectionStrategy fileSelectionStrategy = null)
         {
-            return new EventProcessorService(processor, parcer, appSettings, logger, workerServiceLogRepository);
+            return new EventProcessorService(processor, parcer, appSettings, logger, fileSelectionStrategy);
         }
         #endregion
 
