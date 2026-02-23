@@ -8,13 +8,12 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 {
     public class ThreadProcessor : IProcessor
     {
-        private readonly ICompositeEventSender _compositeEventSender;
+        private readonly IEventSender _dbSender;
         private readonly ILogger<ThreadProcessor> _logger;
 
-        public ThreadProcessor(ICompositeEventSender compositeEventSender
-            , ILogger<ThreadProcessor> logger)
+        public ThreadProcessor(ILogger<ThreadProcessor> logger, IEventSender dbSender)
         {
-            _compositeEventSender = compositeEventSender;
+            _dbSender = dbSender;
             _logger = logger;
         }
 
@@ -29,7 +28,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                 {
                     try
                     {
-                        _compositeEventSender.Send(range);
+                        _dbSender.Send(range);
                     }
                     catch (Exception ex)
                     {

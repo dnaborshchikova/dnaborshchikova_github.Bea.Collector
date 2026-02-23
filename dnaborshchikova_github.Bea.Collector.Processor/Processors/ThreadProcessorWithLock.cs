@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 {
+    [Obsolete("This class is obsolete. Call ThreadProcessor instead.")]
     public class ThreadProcessorWithLock : IProcessor
     {
         private readonly ICompositeEventSender _compositeEventSender;

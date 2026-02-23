@@ -11,11 +11,12 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
         private readonly ICompositeEventSender _compositeEventSender;
         private readonly ILogger<TaskProcessor> _logger;
         private readonly IWorkerServiceLogRepository _workerServiceLogRepository;
+        private readonly IEventSender _dbSender;
 
-        public TaskProcessor(ICompositeEventSender compositeEventSender
+        public TaskProcessor(IEventSender dbSender
             , ILogger<TaskProcessor> logger, IWorkerServiceLogRepository workerServiceLogRepository)
         {
-            _compositeEventSender = compositeEventSender;
+            _dbSender = dbSender;
             _logger = logger;
             _workerServiceLogRepository = workerServiceLogRepository;
         }
@@ -29,7 +30,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                 {
                     //if (range.Id == 2) //TODO: удалить перед завершением PR по BackgroundTask
                     //    throw new Exception("Диапазон номер 2");
-                    await _compositeEventSender.SendAsync(range);
+                    await _dbSender.SendAsync(range);
                 }
                 catch (Exception ex)
                 {

@@ -47,7 +47,6 @@ builder.Services.AddScoped<Func<string, IProcessor>>(provider => key =>
     };
 });
 builder.Services.AddScoped<IEventSender, DataBaseSender>();
-builder.Services.AddScoped<ICompositeEventSender, CompositeEventSender>();
 builder.Services.AddScoped<IParser, CsvParser>();
 builder.Services.AddScoped<IEventProcessor, EventProcessorService>();
 builder.Services.AddScoped<IWorkerServiceLogRepository, WorkerServiceLogRepository>();
@@ -55,9 +54,9 @@ builder.Services.AddDbContextFactory<CollectorDbContext>(options =>
 {
     options.UseNpgsql(config.GetConnectionString("Default"));
 });
-builder.Services.AddDbContext<CollectorDbContext>(options =>
-{
-    options.UseNpgsql(config.GetConnectionString("Default"));
-});
+//builder.Services.AddDbContext<CollectorDbContext>(options =>
+//{
+//    options.UseNpgsql(config.GetConnectionString("Default"));
+//});
 var host = builder.Build();
 host.Run();

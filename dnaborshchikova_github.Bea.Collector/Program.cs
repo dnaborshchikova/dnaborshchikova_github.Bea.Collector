@@ -9,6 +9,7 @@ using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Processors;
 using dnaborshchikova_github.Bea.Collector.Processor.Services;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
+using dnaborshchikova_github.Bea.Collector.Sender.Senders;
 using dnaborshchikova_github.Bea.Generator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -47,21 +48,18 @@ var host = Host.CreateDefaultBuilder()
     {
         services.AddSingleton(appSettings);
         services.AddScoped<DatabaseInitializer>();
-        services.AddScoped<ThreadProcessorWithLock>();
         services.AddScoped<ThreadProcessor>();
         services.AddScoped<TaskProcessor>();
         services.AddScoped<Func<string, IProcessor>>(provider => key =>
         {
             return key switch
             {
-                //"Thread" => provider.GetRequiredService<ThreadProcessorWithLock>(),
                 "Thread" => provider.GetRequiredService<ThreadProcessor>(),
                 "Task" => provider.GetRequiredService<TaskProcessor>()
             };
         });
-        //services.AddScoped<IEventSender, MessageQueueSender>();
+        services.AddScoped<IEventSender, MessageQueueSender>();
         services.AddScoped<IEventSender, DataBaseSender>();
-        services.AddScoped<ICompositeEventSender, CompositeEventSender>();
         services.AddScoped<IParser, CsvParser>();
         services.AddScoped<IWorkerServiceLogRepository, WorkerServiceLogRepository>();
         services.AddScoped<IEventProcessor, EventProcessorService>();
