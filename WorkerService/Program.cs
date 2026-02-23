@@ -6,6 +6,7 @@ using dnaborshchikova_github.Bea.Collector.DataAccess.DbContext;
 using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories;
 using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
+using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Processors;
 using dnaborshchikova_github.Bea.Collector.Processor.Services;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
@@ -50,13 +51,10 @@ builder.Services.AddScoped<IEventSender, DataBaseSender>();
 builder.Services.AddScoped<IParser, CsvParser>();
 builder.Services.AddScoped<IEventProcessor, EventProcessorService>();
 builder.Services.AddScoped<IWorkerServiceLogRepository, WorkerServiceLogRepository>();
+builder.Services.AddScoped<IFileSelectionStrategy, WorkerFileSelectionStrategy>();
 builder.Services.AddDbContextFactory<CollectorDbContext>(options =>
 {
     options.UseNpgsql(config.GetConnectionString("Default"));
 });
-//builder.Services.AddDbContext<CollectorDbContext>(options =>
-//{
-//    options.UseNpgsql(config.GetConnectionString("Default"));
-//});
 var host = builder.Build();
 host.Run();
