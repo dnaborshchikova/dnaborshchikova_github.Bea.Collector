@@ -29,7 +29,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
 
         public async Task ProcessAsync(CancellationToken cancellationToken)
         {
-            var interval = TimeSpan.FromHours(24); //TODO: получать из конфига
+            var interval = TimeSpan.FromHours(24);
             while (!cancellationToken.IsCancellationRequested)
             {
                 await ProcessAsync();

@@ -17,8 +17,8 @@ using Serilog.Filters;
 using WorkerService;
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.Configuration.AddEnvironmentVariables();
 var config = builder.Configuration;
-
 var generatorSettings = config.GetSection(nameof(GeneratorSettings)).Get<GeneratorSettings>();
 var processingSettings = config.GetSection(nameof(ProcessingSettings)).Get<ProcessingSettings>();
 var workerServiceSettings = config.GetSection(nameof(WorkerServiceSettings)).Get<WorkerServiceSettings>();

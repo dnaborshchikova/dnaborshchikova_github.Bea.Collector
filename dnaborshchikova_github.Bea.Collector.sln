@@ -21,6 +21,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.DataAccess", "dnaborshchikova_github.Bea.DataAccess\dnaborshchikova_github.Bea.Collector.DataAccess.csproj", "{29B68F4F-0703-4F39-8DDC-93B95B852D80}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BED989F9-CAEF-4F7C-B017-8A1C186972C9}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

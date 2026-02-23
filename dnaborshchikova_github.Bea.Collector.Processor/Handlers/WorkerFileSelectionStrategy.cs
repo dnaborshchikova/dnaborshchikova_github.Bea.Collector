@@ -1,15 +1,20 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
+using System.Globalization;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 {
     public class WorkerFileSelectionStrategy : IFileSelectionStrategy
     {
         private readonly IWorkerServiceLogRepository _workerServiceLogRepository;
+        private readonly AppSettings _appSettings;
 
-        public WorkerFileSelectionStrategy(IWorkerServiceLogRepository workerServiceLogRepository)
+        public WorkerFileSelectionStrategy(IWorkerServiceLogRepository workerServiceLogRepository
+            , AppSettings appSettings)
         {
             _workerServiceLogRepository = workerServiceLogRepository;
+            _appSettings = appSettings;
         }
 
         public List<string> GetFiles()
@@ -38,7 +43,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 
         private string BuildFullPath(string fileName)
         {
-            var folderPath = "C:\\"; //TODO: брать путь из конфига
+            var folderPath = _appSettings.ProcessingSettings.InputFolder;
             var filePath = Path.Combine(folderPath, fileName);
 
             return filePath;
@@ -46,7 +51,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 
         private string GetFileName(DateTime date)
         {
-            return $"{date.ToShortDateString()}_BillEvent.csv"; //TODO: брать расширение из конфига
+            return date.ToString("dd.MM.yyyy") + "_BillEvent.csv";
         }
 
         private bool IsFileExists(string filePath)

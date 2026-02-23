@@ -3,7 +3,7 @@ using dnaborshchikova_github.Bea.Collector.DataAccess;
 
 namespace WorkerService
 {
-    public class Worker: BackgroundService
+    public class Worker : BackgroundService
     {
         private readonly IServiceProvider _provider;
 
@@ -18,6 +18,7 @@ namespace WorkerService
             var eventProcessor = scope.ServiceProvider.GetRequiredService<IEventProcessor>();
             var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
             dbContext.Database.EnsureCreated();
+
             await eventProcessor.ProcessAsync(cancellationToken);
         }
     }
