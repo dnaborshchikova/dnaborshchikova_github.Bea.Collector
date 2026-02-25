@@ -1,6 +1,6 @@
 ﻿namespace dnaborshchikova_github.Bea.Collector.Core.Models
 {
-    public class WorkerServiceSendLog
+    public class SendEventLog
     {
         public long Id { get; set; }
         public string FileName { get; set; }
@@ -8,7 +8,7 @@
         public string RunSettings  { get; set; }
         public bool IsSendCompleted { get; set; }
 
-        public WorkerServiceSendLog(string fileName, DateTime runDateTime, string runSettings
+        public SendEventLog(string fileName, DateTime runDateTime, string runSettings
             , bool isSendCompleted)
         {
             this.FileName = fileName;

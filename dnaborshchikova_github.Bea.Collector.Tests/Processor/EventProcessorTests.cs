@@ -19,9 +19,11 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
 
         private EventProcessorService CreateSut(Func<string, IProcessor> processor = null
             , IParser parcer = null, AppSettings appSettings = null
-            , ILogger<EventProcessorService> logger = null, IFileSelectionStrategy fileSelectionStrategy = null)
+            , ILogger<EventProcessorService> logger = null, IFileSelectionStrategy fileSelectionStrategy = null
+            , ISendLogRepository sendLogRepository = null)
         {
-            return new EventProcessorService(processor, parcer, appSettings, logger, fileSelectionStrategy);
+            return new EventProcessorService(processor, parcer, appSettings, logger
+                , fileSelectionStrategy, sendLogRepository);
         }
         #endregion
 
@@ -48,12 +50,6 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
                 .WithProcessingSettings(processingSettings)
                 .Build();
 
-            var processingContext = new ProcessingContext(
-                fileName: appSettings.ProcessingSettings.FilePath,
-                runDateTime: DateTime.Now,
-                runSettings: JsonConvert.SerializeObject(appSettings.ProcessingSettings)
-            );
-
             var logger = NullLogger<EventProcessorService>.Instance;
             var parserMock = new Mock<IParser>();
             parserMock.Setup(p => p.Parse(It.IsAny<string>()))
@@ -75,7 +71,7 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
             //Assert
             parserMock.Verify(p => p.Parse(appSettings.ProcessingSettings.FilePath), Times.Once);
             processorFactoryMock.Verify(f => f(appSettings.ProcessingSettings.ProcessType), Times.Once);
-            processorMock.Verify(p => p.ProcessAsync(It.IsAny<List<EventProcessRange>>(), processingContext), Times.Once);
+            processorMock.Verify(p => p.ProcessAsync(It.IsAny<List<EventProcessRange>>()), Times.Once);
         }
     }
 }

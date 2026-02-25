@@ -8,20 +8,19 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 {
     public class TaskProcessor : IProcessor
     {
-        private readonly ICompositeEventSender _compositeEventSender;
         private readonly ILogger<TaskProcessor> _logger;
-        private readonly IWorkerServiceLogRepository _workerServiceLogRepository;
+        private readonly ISendLogRepository _sendLogRepository;
         private readonly IEventSender _dbSender;
 
         public TaskProcessor(IEventSender dbSender
-            , ILogger<TaskProcessor> logger, IWorkerServiceLogRepository workerServiceLogRepository)
+            , ILogger<TaskProcessor> logger, ISendLogRepository sendLogRepository)
         {
             _dbSender = dbSender;
             _logger = logger;
-            _workerServiceLogRepository = workerServiceLogRepository;
+            _sendLogRepository = sendLogRepository;
         }
 
-        public async Task ProcessAsync(List<EventProcessRange> ranges, ProcessingContext processingContext)
+        public async Task<bool> ProcessAsync(List<EventProcessRange> ranges)
         {
             var isSendCompleted = true;
             var tasks = ranges.Select(async range =>
@@ -41,16 +40,17 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             });
 
             await Task.WhenAll(tasks);
-            SaveSendResult(isSendCompleted, processingContext);
+            return isSendCompleted;
+            //SaveSendResult(isSendCompleted, processingContext);
         }
 
-        private void SaveSendResult(bool isSendCompleted, ProcessingContext processingContext)
-        {
-            var utcRunDateTime = DateTime.SpecifyKind(processingContext.RunDateTime, DateTimeKind.Utc);
-            var fileName = Path.GetFileName(processingContext.FileName);
-            var workerServiceSendLog = new WorkerServiceSendLog(fileName, utcRunDateTime
-                , processingContext.RunSettings, isSendCompleted);
-            _workerServiceLogRepository.SaveSendResult(workerServiceSendLog);
-        }
+        //private void SaveSendResult(bool isSendCompleted, ProcessingContext processingContext)
+        //{
+        //    var utcRunDateTime = DateTime.SpecifyKind(processingContext.RunDateTime, DateTimeKind.Utc);
+        //    var fileName = Path.GetFileName(processingContext.FileName);
+        //    var workerServiceSendLog = new WorkerServiceSendLog(fileName, utcRunDateTime
+        //        , processingContext.RunSettings, isSendCompleted);
+        //    _sendLogRepository.SaveSendResult(workerServiceSendLog);
+        //}
     }
 }

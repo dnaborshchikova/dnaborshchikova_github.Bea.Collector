@@ -15,11 +15,11 @@ namespace dnaborshchikova_github.Bea.Collector.DataAccess.DbContext
 
         public void CreateDatabase()
         {
-            //if (_context.Database.CanConnect()) //TODO: закомментировано для запуска в режиме сервиса.
-            //{
-            //    _context.Database.EnsureDeleted();
-            //    _logger.LogInformation("Database deleted.");
-            //}
+            if (_context.Database.CanConnect()) //TODO: закомментировано для запуска в режиме сервиса.
+            {
+                _context.Database.EnsureDeleted();
+                _logger.LogInformation("Database deleted.");
+            }
 
             if (!_context.Database.CanConnect())
             {

@@ -62,7 +62,7 @@ var host = Host.CreateDefaultBuilder()
         services.AddScoped<IEventSender, MessageQueueSender>();
         services.AddScoped<IEventSender, DataBaseSender>();
         services.AddScoped<IParser, CsvParser>();
-        services.AddScoped<IWorkerServiceLogRepository, WorkerServiceLogRepository>();
+        services.AddScoped<ISendLogRepository, SendLogRepository>();
         services.AddScoped<IEventProcessor, EventProcessorService>();
         services.AddScoped<IFileSelectionStrategy, ConsoleFileSelectionStrategy>();
         services.AddDbContextFactory<CollectorDbContext>(options =>

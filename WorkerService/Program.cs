@@ -50,11 +50,17 @@ builder.Services.AddScoped<Func<string, IProcessor>>(provider => key =>
 builder.Services.AddScoped<IEventSender, DataBaseSender>();
 builder.Services.AddScoped<IParser, CsvParser>();
 builder.Services.AddScoped<IEventProcessor, EventProcessorService>();
-builder.Services.AddScoped<IWorkerServiceLogRepository, WorkerServiceLogRepository>();
+builder.Services.AddScoped<ISendLogRepository, SendLogRepository>();
 builder.Services.AddScoped<IFileSelectionStrategy, WorkerFileSelectionStrategy>();
 builder.Services.AddDbContextFactory<CollectorDbContext>(options =>
 {
     options.UseNpgsql(config.GetConnectionString("Default"));
 });
 var host = builder.Build();
+using (var scope = host.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
+    var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+    databaseInitializer.CreateDatabase();
+}
 host.Run();

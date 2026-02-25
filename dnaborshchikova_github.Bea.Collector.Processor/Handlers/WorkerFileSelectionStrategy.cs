@@ -7,10 +7,10 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 {
     public class WorkerFileSelectionStrategy : IFileSelectionStrategy
     {
-        private readonly IWorkerServiceLogRepository _workerServiceLogRepository;
+        private readonly ISendLogRepository _workerServiceLogRepository;
         private readonly AppSettings _appSettings;
 
-        public WorkerFileSelectionStrategy(IWorkerServiceLogRepository workerServiceLogRepository
+        public WorkerFileSelectionStrategy(ISendLogRepository workerServiceLogRepository
             , AppSettings appSettings)
         {
             _workerServiceLogRepository = workerServiceLogRepository;

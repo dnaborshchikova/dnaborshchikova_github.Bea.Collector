@@ -1,5 +1,7 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
+using dnaborshchikova_github.Bea.Collector.Core.Models;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using Microsoft.Extensions.Logging;
 using System.Data;
@@ -15,16 +17,18 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
         private readonly IParser _parser;
         private readonly ILogger<EventProcessorService> _logger;
         private readonly IFileSelectionStrategy _fileSelectionStrategy;
+        private readonly ISendLogRepository _sendLogRepository;
 
         public EventProcessorService(Func<string, IProcessor> processor, IParser parser
             , AppSettings appSettings, ILogger<EventProcessorService> logger
-            , IFileSelectionStrategy fileSelectionStrategy)
+            , IFileSelectionStrategy fileSelectionStrategy, ISendLogRepository sendLogRepository)
         {
             _parser = parser;
             _processor = processor;
             _appSettings = appSettings;
             _logger = logger;
             _fileSelectionStrategy = fileSelectionStrategy;
+            _sendLogRepository = sendLogRepository;
         }
 
         public async Task ProcessAsync(CancellationToken cancellationToken)
@@ -64,10 +68,8 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
                 _logger.LogInformation($"End generate event ranges.");
 
                 var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
-                var runSettings = JsonSerializer.Serialize(_appSettings);
-                var currentDate = DateTime.Now;
-                var processingContext = new ProcessingContext(filePath, currentDate, runSettings);
-                await processor.ProcessAsync(ranges, processingContext);
+                var isSendCompleted = await processor.ProcessAsync(ranges);
+                SaveSendResult(isSendCompleted, filePath);
             }
             catch (Exception ex)
             {
@@ -79,6 +81,18 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
                 _logger.LogInformation($"End processing {DateTime.Now}." +
                     $"Total processing time: {stopwatch.ElapsedMilliseconds} ms.");
             }
+        }
+
+        private void SaveSendResult(bool isSendCompleted, string filePath)
+        {
+            var runSettings = JsonSerializer.Serialize(_appSettings);
+            var currentDate = DateTime.Now;
+
+            var utcRunDateTime = DateTime.SpecifyKind(currentDate, DateTimeKind.Utc);
+            var fileName = Path.GetFileName(filePath);
+            var workerServiceSendLog = new SendEventLog(fileName, utcRunDateTime, runSettings, isSendCompleted);
+
+            _sendLogRepository.SaveSendResult(workerServiceSendLog);
         }
     }
 }

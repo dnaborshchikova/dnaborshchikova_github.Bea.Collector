@@ -1,26 +1,30 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
+using System.Text.Json;
 
 namespace dnaborshchikova_github.Bea.Collector.DataAccess.Repositories
 {
-    public class WorkerServiceLogRepository : IWorkerServiceLogRepository
+    public class SendLogRepository : ISendLogRepository
     {
         private readonly CollectorDbContext _collectorDbContext;
+        private readonly AppSettings _appSettings;
 
-        public WorkerServiceLogRepository(CollectorDbContext collectorDbContext)
+        public SendLogRepository(CollectorDbContext collectorDbContext, AppSettings appSettings)
         {
             _collectorDbContext = collectorDbContext;
+            _appSettings = appSettings;
         }
 
-        public void SaveSendResult(WorkerServiceSendLog workerServiceSendLog)
+        public void SaveSendResult(SendEventLog sendEventLog)
         {
-            _collectorDbContext.WorkerServiceSendLogs.Add(workerServiceSendLog);
+            _collectorDbContext.SendEventLogs.Add(sendEventLog);
             _collectorDbContext.SaveChanges();
         }
 
-        public WorkerServiceSendLog IsPreviousDaySendComplete(string fileName)
+        public SendEventLog IsPreviousDaySendComplete(string fileName)
         {
-            return _collectorDbContext.WorkerServiceSendLogs
+            return _collectorDbContext.SendEventLogs
                   .Where(l => l.FileName == fileName)
                   .OrderByDescending(l => l.RunDateTime)
                   .ToList()
