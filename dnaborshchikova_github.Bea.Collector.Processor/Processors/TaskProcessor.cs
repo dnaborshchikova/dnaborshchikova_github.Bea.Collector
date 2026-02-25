@@ -9,11 +9,11 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
     public class TaskProcessor : IProcessor
     {
         private readonly ILogger<TaskProcessor> _logger;
-        private readonly ISendLogRepository _sendLogRepository;
+        private readonly ISendEventLogRepository _sendLogRepository;
         private readonly IEventSender _dbSender;
 
         public TaskProcessor(IEventSender dbSender
-            , ILogger<TaskProcessor> logger, ISendLogRepository sendLogRepository)
+            , ILogger<TaskProcessor> logger, ISendEventLogRepository sendLogRepository)
         {
             _dbSender = dbSender;
             _logger = logger;

@@ -50,7 +50,7 @@ builder.Services.AddScoped<Func<string, IProcessor>>(provider => key =>
 builder.Services.AddScoped<IEventSender, DataBaseSender>();
 builder.Services.AddScoped<IParser, CsvParser>();
 builder.Services.AddScoped<IEventProcessor, EventProcessorService>();
-builder.Services.AddScoped<ISendLogRepository, SendLogRepository>();
+builder.Services.AddScoped<ISendEventLogRepository, SendEventLogRepository>();
 builder.Services.AddScoped<IFileSelectionStrategy, WorkerFileSelectionStrategy>();
 builder.Services.AddDbContextFactory<CollectorDbContext>(options =>
 {

@@ -5,12 +5,12 @@ using System.Text.Json;
 
 namespace dnaborshchikova_github.Bea.Collector.DataAccess.Repositories
 {
-    public class SendLogRepository : ISendLogRepository
+    public class SendEventLogRepository : ISendEventLogRepository
     {
         private readonly CollectorDbContext _collectorDbContext;
         private readonly AppSettings _appSettings;
 
-        public SendLogRepository(CollectorDbContext collectorDbContext, AppSettings appSettings)
+        public SendEventLogRepository(CollectorDbContext collectorDbContext, AppSettings appSettings)
         {
             _collectorDbContext = collectorDbContext;
             _appSettings = appSettings;

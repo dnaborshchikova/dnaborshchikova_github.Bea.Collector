@@ -17,11 +17,11 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
         private readonly IParser _parser;
         private readonly ILogger<EventProcessorService> _logger;
         private readonly IFileSelectionStrategy _fileSelectionStrategy;
-        private readonly ISendLogRepository _sendLogRepository;
+        private readonly ISendEventLogRepository _sendLogRepository;
 
         public EventProcessorService(Func<string, IProcessor> processor, IParser parser
             , AppSettings appSettings, ILogger<EventProcessorService> logger
-            , IFileSelectionStrategy fileSelectionStrategy, ISendLogRepository sendLogRepository)
+            , IFileSelectionStrategy fileSelectionStrategy, ISendEventLogRepository sendLogRepository)
         {
             _parser = parser;
             _processor = processor;
