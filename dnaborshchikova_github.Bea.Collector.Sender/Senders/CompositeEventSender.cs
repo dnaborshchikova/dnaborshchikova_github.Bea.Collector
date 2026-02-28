@@ -3,6 +3,7 @@ using dnaborshchikova_github.Bea.Collector.Core.Models;
 
 namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
 {
+    [Obsolete("This class is obsolete.")]
     public class CompositeEventSender : ICompositeEventSender
     {
         private readonly IEnumerable<IEventSender> _senders;

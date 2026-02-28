@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.App", "dnaborshchikova_github.Bea.Collector\dnaborshchikova_github.Bea.Collector.App.csproj", "{AC5416B8-F8BB-43D7-998E-566AB20FE6F8}"
 EndProject
@@ -16,6 +16,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.Core", "dnaborshchikova_github.Bea.Collector.Core\dnaborshchikova_github.Bea.Collector.Core.csproj", "{3D3CA43F-25C2-48A5-A969-DE6AE4E1388F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.Tests", "dnaborshchikova_github.Bea.Collector.Tests\dnaborshchikova_github.Bea.Collector.Tests.csproj", "{59E67F4B-6D7B-48D3-B8FC-F2A11A1073FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.WorkerService", "WorkerService\dnaborshchikova_github.Bea.Collector.WorkerService.csproj", "{6BD129D9-6BA5-4A70-AB79-28489EF80D5D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.DataAccess", "dnaborshchikova_github.Bea.DataAccess\dnaborshchikova_github.Bea.Collector.DataAccess.csproj", "{29B68F4F-0703-4F39-8DDC-93B95B852D80}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BED989F9-CAEF-4F7C-B017-8A1C186972C9}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +60,14 @@ Global
 		{59E67F4B-6D7B-48D3-B8FC-F2A11A1073FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59E67F4B-6D7B-48D3-B8FC-F2A11A1073FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59E67F4B-6D7B-48D3-B8FC-F2A11A1073FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BD129D9-6BA5-4A70-AB79-28489EF80D5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BD129D9-6BA5-4A70-AB79-28489EF80D5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BD129D9-6BA5-4A70-AB79-28489EF80D5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BD129D9-6BA5-4A70-AB79-28489EF80D5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29B68F4F-0703-4F39-8DDC-93B95B852D80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29B68F4F-0703-4F39-8DDC-93B95B852D80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29B68F4F-0703-4F39-8DDC-93B95B852D80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29B68F4F-0703-4F39-8DDC-93B95B852D80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Core\dnaborshchikova_github.Bea.Collector.Core.csproj" />
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Parser\dnaborshchikova_github.Bea.Collector.Parser.csproj" />
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Processor\dnaborshchikova_github.Bea.Collector.Processor.csproj" />
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Sender\dnaborshchikova_github.Bea.Collector.Sender.csproj" />
+  </ItemGroup>
+</Project>

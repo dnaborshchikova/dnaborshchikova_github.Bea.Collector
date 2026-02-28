@@ -1,4 +1,4 @@
-﻿namespace dnaborshchikova_github.Bea.Collector.Processor.Services
+﻿namespace dnaborshchikova_github.Bea.Collector.Processor
 {
     public class ProcessingException : Exception
     {

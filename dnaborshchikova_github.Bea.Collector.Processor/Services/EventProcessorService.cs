@@ -1,9 +1,12 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
+using dnaborshchikova_github.Bea.Collector.Core.Models;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Services
 {
@@ -13,25 +16,38 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
         private readonly Func<string, IProcessor> _processor;
         private readonly IParser _parser;
         private readonly ILogger<EventProcessorService> _logger;
+        private readonly IFileSelectionStrategy _fileSelectionStrategy;
+        private readonly ISendEventLogRepository _sendLogRepository;
 
         public EventProcessorService(Func<string, IProcessor> processor, IParser parser
-            , AppSettings appSettings, ILogger<EventProcessorService> logger)
+            , AppSettings appSettings, ILogger<EventProcessorService> logger
+            , IFileSelectionStrategy fileSelectionStrategy, ISendEventLogRepository sendLogRepository)
         {
             _parser = parser;
             _processor = processor;
             _appSettings = appSettings;
             _logger = logger;
+            _fileSelectionStrategy = fileSelectionStrategy;
+            _sendLogRepository = sendLogRepository;
         }
 
         public async Task ProcessAsync()
         {
             _logger.LogInformation($"Start processing {DateTime.Now}.");
+            var filePaths = _fileSelectionStrategy.GetFiles();
+            foreach (var filePath in filePaths)
+            {
+                await ProcessFile(filePath);
+            }
+        }
+
+        private async Task ProcessFile(string filePath)
+        {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             try
             {
-                var filePath = _appSettings.ProcessingSettings.FilePath;
                 _logger.LogInformation($"Parse file. File path: {filePath}");
                 var billEvents = _parser.Parse(filePath).OrderBy(e => e.OperationDateTime).ToList();
 
@@ -42,7 +58,8 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
                 _logger.LogInformation($"End generate event ranges.");
 
                 var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
-                await processor.ProcessAsync(ranges);
+                var isSendCompleted = await processor.ProcessAsync(ranges);
+                SaveSendResult(isSendCompleted, filePath);
             }
             catch (Exception ex)
             {
@@ -54,6 +71,18 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
                 _logger.LogInformation($"End processing {DateTime.Now}." +
                     $"Total processing time: {stopwatch.ElapsedMilliseconds} ms.");
             }
-        }    
+        }
+
+        private void SaveSendResult(bool isSendCompleted, string filePath)
+        {
+            var runSettings = JsonSerializer.Serialize(_appSettings);
+            var currentDate = DateTime.Now;
+
+            var utcRunDateTime = DateTime.SpecifyKind(currentDate, DateTimeKind.Utc);
+            var fileName = Path.GetFileName(filePath);
+            var workerServiceSendLog = new SendEventLog(fileName, utcRunDateTime, runSettings, isSendCompleted);
+
+            _sendLogRepository.SaveSendResult(workerServiceSendLog);
+        }
     }
 }

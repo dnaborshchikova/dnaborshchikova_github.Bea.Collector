@@ -1,9 +1,11 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using Microsoft.Extensions.Logging;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 {
+    [Obsolete("This class is obsolete. Call ThreadProcessor instead.")]
     public class ThreadProcessorWithLock : IProcessor
     {
         private readonly ICompositeEventSender _compositeEventSender;
@@ -18,11 +20,11 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             _logger = logger;
         }
 
-        public async Task ProcessAsync(List<EventProcessRange> ranges)
+        public async Task<bool> ProcessAsync(List<EventProcessRange> ranges)
         {
             completedThreads = ranges.Count;
             var exceptions = new List<Exception>();
-
+            var isSendCompleted = true;
             foreach (var range in ranges)
             {
                 var thread = new Thread(() => ProcessRange(range, exceptions));
@@ -41,7 +43,10 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             {
                 _logger.LogInformation($"При обработке данных возникли ошибки:\n" +
                     $"{string.Join(";\n", exceptions)}");
+                isSendCompleted = false;
             }
+
+            return isSendCompleted;
         }
 
         private void ProcessRange(EventProcessRange range, List<Exception> exceptions)

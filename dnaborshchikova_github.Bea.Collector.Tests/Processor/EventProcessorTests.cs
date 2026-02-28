@@ -2,11 +2,13 @@
 using dnaborshchikova_github.Bea.Collector.Core.Models;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Processor.Services;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Tests.Processor.Builders;
 using dnaborshchikova_github.Bea.Collector.Tests.Processor.Factories;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
@@ -17,9 +19,11 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
 
         private EventProcessorService CreateSut(Func<string, IProcessor> processor = null
             , IParser parcer = null, AppSettings appSettings = null
-            , ILogger<EventProcessorService> logger = null)
+            , ILogger<EventProcessorService> logger = null, IFileSelectionStrategy fileSelectionStrategy = null
+            , ISendEventLogRepository sendLogRepository = null)
         {
-            return new EventProcessorService(processor, parcer, appSettings, logger);
+            return new EventProcessorService(processor, parcer, appSettings, logger
+                , fileSelectionStrategy, sendLogRepository);
         }
         #endregion
 

@@ -18,6 +18,7 @@
     <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Parser\dnaborshchikova_github.Bea.Collector.Parser.csproj" />
     <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Processor\dnaborshchikova_github.Bea.Collector.Processor.csproj" />
     <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Sender\dnaborshchikova_github.Bea.Collector.Sender.csproj" />
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.DataAccess\dnaborshchikova_github.Bea.Collector.DataAccess.csproj" />
   </ItemGroup>
 
   <ItemGroup>

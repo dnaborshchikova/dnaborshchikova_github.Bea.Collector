@@ -1,7 +1,7 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace dnaborshchikova_github.Bea.Collector.Sender
+namespace dnaborshchikova_github.Bea.Collector.DataAccess
 {
     public class CollectorDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
@@ -11,6 +11,7 @@ namespace dnaborshchikova_github.Bea.Collector.Sender
         }
 
         public DbSet<SendEvent> SendEvents { get; set; }
+        public DbSet<SendEventLog> SendEventLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
