@@ -4,7 +4,7 @@ namespace dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interface
 {
     public interface ISendEventLogRepository
     {
-        void SaveSendResult(SendEventLog sendEventLog);
+        Task SaveSendResult(SendEventLog sendEventLog);
         SendEventLog IsPreviousDaySendComplete(string filePath);
     }
 }

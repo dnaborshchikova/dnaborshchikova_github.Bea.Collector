@@ -8,15 +8,13 @@ namespace dnaborshchikova_github.Bea.Collector.DataAccess.Repositories
     public class SendEventLogRepository : ISendEventLogRepository
     {
         private readonly CollectorDbContext _collectorDbContext;
-        private readonly AppSettings _appSettings;
 
-        public SendEventLogRepository(CollectorDbContext collectorDbContext, AppSettings appSettings)
+        public SendEventLogRepository(CollectorDbContext collectorDbContext)
         {
             _collectorDbContext = collectorDbContext;
-            _appSettings = appSettings;
         }
 
-        public void SaveSendResult(SendEventLog sendEventLog)
+        public async Task SaveSendResult(SendEventLog sendEventLog)
         {
             _collectorDbContext.SendEventLogs.Add(sendEventLog);
             _collectorDbContext.SaveChanges();

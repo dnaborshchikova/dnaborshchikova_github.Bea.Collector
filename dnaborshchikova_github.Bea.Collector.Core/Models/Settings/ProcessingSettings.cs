@@ -8,6 +8,7 @@
         public int ThreadCount { get; set; }
         public string ProcessType { get; set; }
         public string InputFolder { get; set; }
+        public string RunMode { get; set; }
 
         public void Validate()
         {

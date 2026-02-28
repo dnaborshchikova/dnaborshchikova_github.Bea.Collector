@@ -31,16 +31,6 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
             _sendLogRepository = sendLogRepository;
         }
 
-        public async Task ProcessAsync(CancellationToken cancellationToken)
-        {
-            var interval = TimeSpan.FromHours(24);
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                await ProcessAsync();
-                await Task.Delay(interval, cancellationToken);
-            }
-        }
-
         public async Task ProcessAsync()
         {
             _logger.LogInformation($"Start processing {DateTime.Now}.");
