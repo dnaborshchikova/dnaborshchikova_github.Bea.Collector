@@ -21,7 +21,6 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Handlers
             _contextFactory = contextFactory;
         }
 
-        [Obsolete("This method is obsolete. Call SendAsync instead.")]
         public void Send(EventProcessRange range)
         {
             _logger.LogInformation($"Start save events. Range id: {range.Id}. Event count: {range.BillEvents.Count}. " +

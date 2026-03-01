@@ -14,10 +14,10 @@ namespace dnaborshchikova_github.Bea.Collector.DataAccess.Repositories
             _collectorDbContext = collectorDbContext;
         }
 
-        public async Task SaveSendResult(SendEventLog sendEventLog)
+        public async Task SaveSendResultAsync(SendEventLog sendEventLog)
         {
             _collectorDbContext.SendEventLogs.Add(sendEventLog);
-            _collectorDbContext.SaveChanges();
+            await _collectorDbContext.SaveChangesAsync();
         }
 
         public SendEventLog IsPreviousDaySendComplete(string fileName)

@@ -1,23 +1,20 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models;
-using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using Microsoft.Extensions.Logging;
 
 namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 {
-    [Obsolete("This class is obsolete. Call ThreadProcessor instead.")]
     public class ThreadProcessorWithLock : IProcessor
     {
-        private readonly ICompositeEventSender _compositeEventSender;
         private readonly ILogger<ThreadProcessor> _logger;
+        private readonly IEventSender _eventSender;
         private readonly object locker = new object();
         private int completedThreads;
 
-        public ThreadProcessorWithLock(ICompositeEventSender compositeEventSender
-            , ILogger<ThreadProcessor> logger)
+        public ThreadProcessorWithLock(ILogger<ThreadProcessor> logger, IEventSender eventSender)
         {
-            _compositeEventSender = compositeEventSender;
             _logger = logger;
+            _eventSender = eventSender;
         }
 
         public async Task<bool> ProcessAsync(List<EventProcessRange> ranges)
@@ -53,7 +50,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
         {
             try
             {
-                _compositeEventSender.Send(range);
+                _eventSender.Send(range);
             }
             catch (Exception ex)
             {

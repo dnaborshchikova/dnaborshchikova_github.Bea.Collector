@@ -59,7 +59,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
 
                 var processor = _processor(_appSettings.ProcessingSettings.ProcessType);
                 var isSendCompleted = await processor.ProcessAsync(ranges);
-                SaveSendResult(isSendCompleted, filePath);
+                await SaveSendResultAsync(isSendCompleted, filePath);
             }
             catch (Exception ex)
             {
@@ -73,7 +73,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
             }
         }
 
-        private void SaveSendResult(bool isSendCompleted, string filePath)
+        private async Task SaveSendResultAsync(bool isSendCompleted, string filePath)
         {
             var runSettings = JsonSerializer.Serialize(_appSettings);
             var currentDate = DateTime.Now;
@@ -82,7 +82,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Services
             var fileName = Path.GetFileName(filePath);
             var workerServiceSendLog = new SendEventLog(fileName, utcRunDateTime, runSettings, isSendCompleted);
 
-            _sendLogRepository.SaveSendResult(workerServiceSendLog);
+            await _sendLogRepository.SaveSendResultAsync(workerServiceSendLog);
         }
     }
 }

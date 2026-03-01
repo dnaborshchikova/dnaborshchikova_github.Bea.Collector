@@ -56,7 +56,8 @@ var host = Host.CreateDefaultBuilder()
             return key switch
             {
                 "Thread" => provider.GetRequiredService<ThreadProcessor>(),
-                "Task" => provider.GetRequiredService<TaskProcessor>()
+                "Task" => provider.GetRequiredService<TaskProcessor>(),
+                "ThreadProcessorWithLock" => provider.GetRequiredService<ThreadProcessorWithLock>(),
             };
         });
         services.AddScoped<IEventSender, MessageQueueSender>();
