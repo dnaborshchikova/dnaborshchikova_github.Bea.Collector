@@ -17,11 +17,9 @@ namespace dnaborshchikova_github.Bea.Collector.DataAccess.DbContext
         {
             try
             {
-                // Удаляем базу (если она существует)
                 _context.Database.EnsureDeleted();
                 _logger.LogInformation("Database deleted.");
 
-                // Создаём базу и все таблицы заново
                 _context.Database.EnsureCreated();
                 _logger.LogInformation("Database created with tables.");
             }
