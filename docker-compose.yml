@@ -5,13 +5,14 @@ services:
     image: postgres:15
     container_name: collector_db
     environment:
+      TZ: "Europe/Moscow"
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: collector
+      POSTGRES_DB: Collector
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - dnaborshchikova_githubbeacollector_pgdata:/var/lib/postgresql/data
 
   collector:
     build: .
@@ -19,12 +20,13 @@ services:
     depends_on:
       - db
     environment:
+      TZ: "Europe/Moscow"
       ProcessingSettings__InputFolder: "/app/input"
       PROCESSING_FOLDER_PATH: /files
       ConnectionStrings__Default: Host=db;Port=5432;Database=Collector;Username=postgres;Password=postgres
       ProcessingSettings__RunMode: "Worker"
     volumes:
-      - C:\Collector\Input:/app/input
+      - C:/Data:/app/input
 
 volumes:
-  pgdata:
+  dnaborshchikova_githubbeacollector_pgdata:

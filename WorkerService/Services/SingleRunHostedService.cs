@@ -16,6 +16,8 @@ namespace dnaborshchikova_github.Bea.Collector.WorkerService.Services
             using var scope = _serviceProvider.CreateScope();
             var processor = scope.ServiceProvider.GetRequiredService<IEventProcessor>();
             await processor.ProcessAsync();
+
+            //Environment.Exit(0);
         }
     }
 }

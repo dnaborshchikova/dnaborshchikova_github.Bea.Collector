@@ -15,16 +15,20 @@ namespace dnaborshchikova_github.Bea.Collector.DataAccess.DbContext
 
         public void CreateDatabase()
         {
-            if (_context.Database.CanConnect()) //TODO: закомментировано для запуска в режиме сервиса.
+            try
             {
+                // Удаляем базу (если она существует)
                 _context.Database.EnsureDeleted();
                 _logger.LogInformation("Database deleted.");
-            }
 
-            if (!_context.Database.CanConnect())
-            {
+                // Создаём базу и все таблицы заново
                 _context.Database.EnsureCreated();
-                _logger.LogInformation("Database created.");
+                _logger.LogInformation("Database created with tables.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating database.");
+                throw;
             }
         }
     }

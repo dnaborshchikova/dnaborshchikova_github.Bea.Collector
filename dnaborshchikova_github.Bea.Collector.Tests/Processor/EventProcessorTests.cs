@@ -8,7 +8,6 @@ using dnaborshchikova_github.Bea.Collector.Tests.Processor.Factories;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace dnaborshchikova_github.Bea.Collector.Tests.Processor

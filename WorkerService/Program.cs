@@ -76,9 +76,9 @@ var host = Host.CreateDefaultBuilder(args)
         });
 
         // Условия для разных режимов работы
-        if (appSettings.ProcessingSettings.RunMode == "Worker")
+        if (appSettings.ProcessingSettings.RunMode == "OneTime")
             services.AddHostedService<SingleRunHostedService>();
-        if (appSettings.ProcessingSettings.RunMode == "Service")
+        if (appSettings.ProcessingSettings.RunMode == "ScheduledService")
             services.AddHostedService<PeriodicHostedService>();
     })
     .ConfigureLogging(logging =>
