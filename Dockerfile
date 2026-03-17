@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 COPY dnaborshchikova_github.Bea.Collector.sln ./
-COPY WorkerService/dnaborshchikova_github.Bea.Collector.WorkerService.csproj ./WorkerService/
+COPY dnaborshchikova_github.Bea.Collector.WorkerService/*.csproj ./dnaborshchikova_github.Bea.Collector.WorkerService/
 COPY dnaborshchikova_github.Bea.Collector.Core/*.csproj ./dnaborshchikova_github.Bea.Collector.Core/
 COPY dnaborshchikova_github.Bea.Collector.DataAccess/*.csproj ./dnaborshchikova_github.Bea.Collector.DataAccess/
 COPY dnaborshchikova_github.Bea.Collector.Generator/*.csproj ./dnaborshchikova_github.Bea.Collector.Generator/
