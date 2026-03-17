@@ -26,7 +26,7 @@ services:
       ConnectionStrings__Default: Host=db;Port=5432;Database=Collector;Username=postgres;Password=postgres
       ProcessingSettings__RunMode: "Worker"
     volumes:
-      - C:/Data:/app/input
+      - ./dnaborshchikova_github.Bea.Collector.WorkerService/TestData:/app/input
       
   pgadmin:
     image: dpage/pgadmin4

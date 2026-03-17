@@ -94,4 +94,5 @@ using (var scope = host.Services.CreateScope())
     var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
     databaseInitializer.CreateDatabase();
 }
+
 host.Run();
