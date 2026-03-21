@@ -22,7 +22,7 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
             var currentDate = GetCurrentDate();
             var filePaths = new List<string>();
             var previuosDayFileName = GetFileName(currentDate.AddDays(-1));
-            var previuosDaySendLog = _workerServiceLogRepository.IsPreviousDaySendComplete(previuosDayFileName);
+            var previuosDaySendLog = _workerServiceLogRepository.GetPreviousDaySendLog(previuosDayFileName);
             if (previuosDaySendLog != null && !previuosDaySendLog.IsSendCompleted)
             {
                 var filePath = BuildFullPath(previuosDayFileName);
@@ -43,10 +43,11 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Handlers
 
         private string BuildFullPath(string fileName)
         {
-            var folderPath = _appSettings.ProcessingSettings.InputFolder;
-            var filePath = Path.Combine(folderPath, fileName);
+            var basePath = AppContext.BaseDirectory;
+            var inputFolderName = _appSettings.ProcessingSettings.InputFolder;
+            var inputFolderPath = Path.Combine(basePath, inputFolderName, fileName);
 
-            return filePath;
+            return inputFolderPath;
         }
 
         private string GetFileName(DateTime date)

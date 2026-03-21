@@ -11,11 +11,11 @@ COPY dnaborshchikova_github.Bea.Collector.Parser/*.csproj ./dnaborshchikova_gith
 COPY dnaborshchikova_github.Bea.Collector.Processor/*.csproj ./dnaborshchikova_github.Bea.Collector.Processor/
 COPY dnaborshchikova_github.Bea.Collector.Sender/*.csproj ./dnaborshchikova_github.Bea.Collector.Sender/
 
-RUN dotnet restore ./WorkerService/dnaborshchikova_github.Bea.Collector.WorkerService.csproj
+RUN dotnet restore ./dnaborshchikova_github.Bea.Collector.WorkerService/dnaborshchikova_github.Bea.Collector.WorkerService.csproj
 
 COPY . .
 
-RUN dotnet publish -c Release -o /app ./WorkerService/dnaborshchikova_github.Bea.Collector.WorkerService.csproj
+RUN dotnet publish -c Release -o /app ./dnaborshchikova_github.Bea.Collector.WorkerService/dnaborshchikova_github.Bea.Collector.WorkerService.csproj
 
 # Stage 2
 FROM mcr.microsoft.com/dotnet/aspnet:8.0

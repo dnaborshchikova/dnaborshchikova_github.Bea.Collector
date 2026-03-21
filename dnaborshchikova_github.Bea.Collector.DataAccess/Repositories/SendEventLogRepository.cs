@@ -1,7 +1,5 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Models;
-using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
-using System.Text.Json;
 
 namespace dnaborshchikova_github.Bea.Collector.DataAccess.Repositories
 {
@@ -20,7 +18,7 @@ namespace dnaborshchikova_github.Bea.Collector.DataAccess.Repositories
             await _collectorDbContext.SaveChangesAsync();
         }
 
-        public SendEventLog IsPreviousDaySendComplete(string fileName)
+        public SendEventLog GetPreviousDaySendLog(string fileName)
         {
             return _collectorDbContext.SendEventLogs
                   .Where(l => l.FileName == fileName)
