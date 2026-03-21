@@ -72,7 +72,15 @@ var host = Host.CreateDefaultBuilder(args)
         // Настройка подключения к базе данных
         services.AddDbContextFactory<CollectorDbContext>(options =>
         {
-            options.UseNpgsql(config.GetConnectionString("Default"));
+            options.UseNpgsql(config.GetConnectionString("Default"),
+            npgsqlOptions =>
+            {
+                npgsqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(5),
+                    errorCodesToAdd: null
+                );
+            });
         });
 
         // Условия для разных режимов работы

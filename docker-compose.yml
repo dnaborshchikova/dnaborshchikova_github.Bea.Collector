@@ -27,7 +27,7 @@ services:
       ProcessingSettings__RunMode: "Worker"
     volumes:
       - ./dnaborshchikova_github.Bea.Collector.WorkerService/TestData:/app/input
-      
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
