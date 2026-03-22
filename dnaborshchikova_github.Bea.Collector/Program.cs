@@ -1,4 +1,5 @@
-﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
+﻿using dnaborshchikova_github.Bea.Collector.App.Validators;
+using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Core.Services;
 using dnaborshchikova_github.Bea.Collector.DataAccess;
@@ -24,8 +25,24 @@ using System.Diagnostics;
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
-var generatorSettings = config.GetSection(nameof(GeneratorSettings)).Get<GeneratorSettings>();
-var processingSettings = config.GetSection(nameof(ProcessingSettings)).Get<ProcessingSettings>();
+
+var generatorSettingsSection = config.GetSection(nameof(GeneratorSettings));
+if (string.IsNullOrWhiteSpace(generatorSettingsSection["PaidBillEventCount"]))
+    throw new InvalidOperationException("PaidBillEventCount не указан");
+if (string.IsNullOrWhiteSpace(generatorSettingsSection["CancelledBillEventCount"]))
+    throw new InvalidOperationException("CancelledBillEventCount не указан");
+var generatorSettings = generatorSettingsSection.Get<GeneratorSettings>();
+
+var processingSettingsSection = config.GetSection(nameof(ProcessingSettings));
+if (string.IsNullOrWhiteSpace(processingSettingsSection["ThreadCount"]))
+    throw new InvalidOperationException("ThreadCount не указан");
+var processingSettings = processingSettingsSection.Get<ProcessingSettings>();
+
+var appSettingsValidator = new AppSettingsValidator();
+appSettingsValidator.ValidateGeneratorSettings(generatorSettings);
+appSettingsValidator.ValidateProcessingSettings(processingSettings);
+
+
 var appSettingsService = new AppSettingsService();
 var appSettings = appSettingsService.CreateAppSettings(generatorSettings, processingSettings);
 
@@ -117,6 +134,7 @@ void RunGenerator()
     else if (appSettings.ProcessingSettings.GenerateFile)
     {
         var runner = new AppRunner(appSettings.GeneratorSettings);
-        appSettings.ProcessingSettings.FilePath = runner.Generate();
+        var folderPath = AppContext.BaseDirectory;
+        appSettings.ProcessingSettings.FilePath = runner.Generate(folderPath);
     }
 }

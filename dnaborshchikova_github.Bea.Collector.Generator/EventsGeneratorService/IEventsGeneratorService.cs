@@ -2,6 +2,6 @@
 {
     public interface IEventsGeneratorService
     {
-        public string GenerateEvents();
+        public string GenerateEvents(string folderPath);
     }
 }

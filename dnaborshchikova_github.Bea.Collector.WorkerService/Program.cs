@@ -12,6 +12,8 @@ using dnaborshchikova_github.Bea.Collector.Processor.Services;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
 using dnaborshchikova_github.Bea.Collector.WorkerService.Models;
 using dnaborshchikova_github.Bea.Collector.WorkerService.Services;
+using dnaborshchikova_github.Bea.Collector.WorkerService.Validators;
+using dnaborshchikova_github.Bea.Generator;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Filters;
@@ -21,6 +23,29 @@ var builder = Host.CreateApplicationBuilder(args);
 // Конфигурация
 builder.Configuration.AddEnvironmentVariables();
 var config = builder.Configuration;
+
+// Чтение настроек из конфигурации
+var section = config.GetSection(nameof(GeneratorSettings));
+if (string.IsNullOrWhiteSpace(section["PaidBillEventCount"]))
+    throw new InvalidOperationException("PaidBillEventCount не указан");
+if (string.IsNullOrWhiteSpace(section["CancelledBillEventCount"]))
+    throw new InvalidOperationException("CancelledBillEventCount не указан");
+var generatorSettings = section.Get<GeneratorSettings>();
+
+var processingSettingsSection = config.GetSection(nameof(ProcessingSettings));
+if (string.IsNullOrWhiteSpace(processingSettingsSection["ThreadCount"]))
+    throw new InvalidOperationException("ThreadCount не указан");
+var processingSettings = processingSettingsSection.Get<ProcessingSettings>(); 
+
+var workerServiceSettings = config.GetSection(nameof(WorkerServiceSettings)).Get<WorkerServiceSettings>();
+
+var appSettingsValidator = new WorkerSettingsValidator();
+appSettingsValidator.ValidateGeneratorSettings(generatorSettings);
+appSettingsValidator.ValidateProcessingSettings(processingSettings);
+
+var appSettingsService = new AppSettingsService();
+var appSettings = appSettingsService.CreateAppSettings(generatorSettings, processingSettings);
+
 
 // Настройка Serilog
 Log.Logger = new LoggerConfiguration()
@@ -37,17 +62,9 @@ builder.Logging.AddSerilog();
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
-        // Чтение настроек из конфигурации
-        var config = hostContext.Configuration;
-        var generatorSettings = config.GetSection(nameof(GeneratorSettings)).Get<GeneratorSettings>();
-        var processingSettings = config.GetSection(nameof(ProcessingSettings)).Get<ProcessingSettings>();
-        var workerServiceSettings = config.GetSection(nameof(WorkerServiceSettings)).Get<WorkerServiceSettings>();
-
-        var appSettingsService = new AppSettingsService();
-        var appSettings = appSettingsService.CreateAppSettings(generatorSettings, processingSettings);
-
         // Регистрация зависимостей
         services.AddSingleton(appSettings);
+        services.AddSingleton(generatorSettings);
 
         services.AddScoped<DatabaseInitializer>();
         services.AddScoped<ThreadProcessor>();
@@ -68,6 +85,7 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddScoped<IEventProcessor, EventProcessorService>();
         services.AddScoped<ISendEventLogRepository, SendEventLogRepository>();
         services.AddScoped<IFileSelectionStrategy, WorkerFileSelectionStrategy>();
+        services.AddScoped<AppRunner>();
 
         // Настройка подключения к базе данных
         services.AddDbContextFactory<CollectorDbContext>(options =>
@@ -102,5 +120,10 @@ using (var scope = host.Services.CreateScope())
     var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
     databaseInitializer.CreateDatabase();
 }
+
+var appRunnerScope = host.Services.CreateScope();
+var appRunner = appRunnerScope.ServiceProvider.GetRequiredService<AppRunner>();
+var basePath = Path.Combine(AppContext.BaseDirectory, appSettings.ProcessingSettings.InputFolder);
+appRunner.Generate(basePath);
 
 host.Run();
