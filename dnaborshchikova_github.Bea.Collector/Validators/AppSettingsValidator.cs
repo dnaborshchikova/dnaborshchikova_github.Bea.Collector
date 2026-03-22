@@ -5,6 +5,12 @@ namespace dnaborshchikova_github.Bea.Collector.App.Validators
 {
     public class AppSettingsValidator : SettingsValidatorBase
     {
+        public void Validate(GeneratorSettings generatorSettings, ProcessingSettings processingSettings)
+        {
+            ValidateGeneratorSettings(generatorSettings);
+            ValidateProcessingSettings(processingSettings);
+        }
+
         public override void ValidateProcessingSettings(ProcessingSettings processingSettings)
         {
             if (processingSettings == null)

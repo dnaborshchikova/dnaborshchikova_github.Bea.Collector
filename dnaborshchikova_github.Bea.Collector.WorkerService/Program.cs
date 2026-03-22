@@ -13,6 +13,7 @@ using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
 using dnaborshchikova_github.Bea.Collector.WorkerService.Models;
 using dnaborshchikova_github.Bea.Collector.WorkerService.Services;
 using dnaborshchikova_github.Bea.Collector.WorkerService.Validators;
+using dnaborshchikova_github.Bea.Collector.Common;
 using dnaborshchikova_github.Bea.Generator;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -25,27 +26,23 @@ builder.Configuration.AddEnvironmentVariables();
 var config = builder.Configuration;
 
 // Чтение настроек из конфигурации
-var section = config.GetSection(nameof(GeneratorSettings));
-if (string.IsNullOrWhiteSpace(section["PaidBillEventCount"]))
-    throw new InvalidOperationException("PaidBillEventCount не указан");
-if (string.IsNullOrWhiteSpace(section["CancelledBillEventCount"]))
-    throw new InvalidOperationException("CancelledBillEventCount не указан");
-var generatorSettings = section.Get<GeneratorSettings>();
+var generatorSettingsSection = config.GetSection(nameof(GeneratorSettings));
+config.GetRequired<GeneratorSettings>("GeneratorSettings", "PaidBillEventCount", "CancelledBillEventCount");
+var generatorSettings = generatorSettingsSection.Get<GeneratorSettings>();
 
 var processingSettingsSection = config.GetSection(nameof(ProcessingSettings));
-if (string.IsNullOrWhiteSpace(processingSettingsSection["ThreadCount"]))
-    throw new InvalidOperationException("ThreadCount не указан");
-var processingSettings = processingSettingsSection.Get<ProcessingSettings>(); 
+config.GetRequired<ProcessingSettings>("ProcessingSettings", "ThreadCount");
+var processingSettings = processingSettingsSection.Get<ProcessingSettings>();
 
-var workerServiceSettings = config.GetSection(nameof(WorkerServiceSettings)).Get<WorkerServiceSettings>();
+var workerServiceSettingsSection = config.GetSection(nameof(WorkerServiceSettings));
+config.GetRequired<WorkerServiceSettings>("WorkerServiceSettings", "IntervalHours");
+var workerServiceSettings = workerServiceSettingsSection.Get<WorkerServiceSettings>();
 
-var appSettingsValidator = new WorkerSettingsValidator();
-appSettingsValidator.ValidateGeneratorSettings(generatorSettings);
-appSettingsValidator.ValidateProcessingSettings(processingSettings);
+var workerSettingsValidator = new WorkerSettingsValidator();
+workerSettingsValidator.Validate(generatorSettings, processingSettings, workerServiceSettings);
 
 var appSettingsService = new AppSettingsService();
 var appSettings = appSettingsService.CreateAppSettings(generatorSettings, processingSettings);
-
 
 // Настройка Serilog
 Log.Logger = new LoggerConfiguration()

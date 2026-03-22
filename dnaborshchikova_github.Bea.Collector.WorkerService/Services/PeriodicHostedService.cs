@@ -1,25 +1,26 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
-using dnaborshchikova_github.Bea.Collector.DataAccess;
-using System.Threading;
+using dnaborshchikova_github.Bea.Collector.WorkerService.Models;
 
 namespace dnaborshchikova_github.Bea.Collector.WorkerService.Services
 {
     public class PeriodicHostedService : BackgroundService
     {
+        private readonly WorkerServiceSettings _serviceSettings;
         private readonly IServiceProvider _serviceProvider;
 
-        public PeriodicHostedService(IServiceProvider serviceProvider)
+        public PeriodicHostedService(WorkerServiceSettings serviceSettings
+            , IServiceProvider serviceProvider)
         {
+            _serviceSettings = serviceSettings;
             _serviceProvider = serviceProvider;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             using var scope = _serviceProvider.CreateScope(); 
-            var eventProcessor = scope.ServiceProvider.GetRequiredService<IEventProcessor>(); 
+            var eventProcessor = scope.ServiceProvider.GetRequiredService<IEventProcessor>();
 
-
-            var interval = TimeSpan.FromHours(24);
+            var interval = TimeSpan.FromHours(_serviceSettings.IntervalHours);
             while (!cancellationToken.IsCancellationRequested)
             {
                 await eventProcessor.ProcessAsync();

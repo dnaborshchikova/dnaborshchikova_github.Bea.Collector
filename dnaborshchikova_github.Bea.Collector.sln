@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36327.8 d17.14
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11605.240 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.App", "dnaborshchikova_github.Bea.Collector\dnaborshchikova_github.Bea.Collector.App.csproj", "{AC5416B8-F8BB-43D7-998E-566AB20FE6F8}"
 EndProject
@@ -25,6 +25,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.WorkerService", "dnaborshchikova_github.Bea.Collector.WorkerService\dnaborshchikova_github.Bea.Collector.WorkerService.csproj", "{2DBA54E3-7A91-B410-DFB1-03B77760DB8D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.DataAccess", "dnaborshchikova_github.Bea.Collector.DataAccess\dnaborshchikova_github.Bea.Collector.DataAccess.csproj", "{DB4EB363-D546-CBA6-8707-0EC1DA20E9B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnaborshchikova_github.Bea.Collector.Common", "dnaborshchikova_github.Bea.Collector.Common\dnaborshchikova_github.Bea.Collector.Common.csproj", "{00DADE58-60BE-40A6-B1B7-27722DC65A00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +70,10 @@ Global
 		{DB4EB363-D546-CBA6-8707-0EC1DA20E9B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB4EB363-D546-CBA6-8707-0EC1DA20E9B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB4EB363-D546-CBA6-8707-0EC1DA20E9B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00DADE58-60BE-40A6-B1B7-27722DC65A00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00DADE58-60BE-40A6-B1B7-27722DC65A00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00DADE58-60BE-40A6-B1B7-27722DC65A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00DADE58-60BE-40A6-B1B7-27722DC65A00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

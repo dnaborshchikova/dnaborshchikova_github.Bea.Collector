@@ -12,6 +12,7 @@ using dnaborshchikova_github.Bea.Collector.Processor.Processors;
 using dnaborshchikova_github.Bea.Collector.Processor.Services;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
 using dnaborshchikova_github.Bea.Collector.Sender.Senders;
+using dnaborshchikova_github.Bea.Collector.Common;
 using dnaborshchikova_github.Bea.Generator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,21 +28,15 @@ var config = new ConfigurationBuilder()
     .Build();
 
 var generatorSettingsSection = config.GetSection(nameof(GeneratorSettings));
-if (string.IsNullOrWhiteSpace(generatorSettingsSection["PaidBillEventCount"]))
-    throw new InvalidOperationException("PaidBillEventCount не указан");
-if (string.IsNullOrWhiteSpace(generatorSettingsSection["CancelledBillEventCount"]))
-    throw new InvalidOperationException("CancelledBillEventCount не указан");
+config.GetRequired<GeneratorSettings>("GeneratorSettings", "PaidBillEventCount", "CancelledBillEventCount");
 var generatorSettings = generatorSettingsSection.Get<GeneratorSettings>();
 
 var processingSettingsSection = config.GetSection(nameof(ProcessingSettings));
-if (string.IsNullOrWhiteSpace(processingSettingsSection["ThreadCount"]))
-    throw new InvalidOperationException("ThreadCount не указан");
+config.GetRequired<ProcessingSettings>("ProcessingSettings", "ThreadCount");
 var processingSettings = processingSettingsSection.Get<ProcessingSettings>();
 
 var appSettingsValidator = new AppSettingsValidator();
-appSettingsValidator.ValidateGeneratorSettings(generatorSettings);
-appSettingsValidator.ValidateProcessingSettings(processingSettings);
-
+appSettingsValidator.Validate(generatorSettings, processingSettings);
 
 var appSettingsService = new AppSettingsService();
 var appSettings = appSettingsService.CreateAppSettings(generatorSettings, processingSettings);

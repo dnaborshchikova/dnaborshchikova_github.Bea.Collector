@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace dnaborshchikova_github.Bea.Collector.WorkerService.Models
+﻿namespace dnaborshchikova_github.Bea.Collector.WorkerService.Models
 {
     public class WorkerServiceSettings
     {
-        public int CheckIntervalHours { get; set; }
+        public int IntervalHours { get; set; }
     }
 }
