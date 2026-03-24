@@ -53,6 +53,9 @@
 ### dnaborshchikova_github.Bea.Collector.Sender
 Отправляет события в очередь сообщений и базу данных.
 
+### dnaborshchikova_github.Bea.Collector.Common
+Общий проект с утилитами для работы с конфигурацией.
+
 ### dnaborshchikova_github.Bea.Collector.Tests
 Модульные тесты для проекта.
 
@@ -107,6 +110,10 @@
 - `FileFormat` — формат создаваемого тестового файла (`csv`).  
 - `PaidBillEventCount` — количество событий оплаты чека, которое будет сгенерировано в файле.  
 - `CancelledBillEventCount` — количество событий отмены чека, которое будет сгенерировано в файле.  
+
+### WorkerServiceSettings
+
+- `IntervalHours` — интервал между запусками обработки файлов в часах (используется в PeriodicHostedService для планирования повторяющихся запусков).
 
 > Processor делит файл на диапазоны по датам и обрабатывает события параллельно в соответствии с настройками. Настройки можно изменять напрямую в `appsettings.json` или через Docker environment.
 
