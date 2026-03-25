@@ -25,6 +25,7 @@ services:
       PROCESSING_FOLDER_PATH: /files
       ConnectionStrings__Default: Host=db;Port=5432;Database=Collector;Username=postgres;Password=postgres
       ProcessingSettings__RunMode: "OneTime"
+      ASPNETCORE_ENVIRONMENT: Development
     volumes:
       - ./dnaborshchikova_github.Bea.Collector.WorkerService/TestData:/app/input
 

@@ -10,6 +10,7 @@ COPY dnaborshchikova_github.Bea.Collector.Generator/*.csproj ./dnaborshchikova_g
 COPY dnaborshchikova_github.Bea.Collector.Parser/*.csproj ./dnaborshchikova_github.Bea.Collector.Parser/
 COPY dnaborshchikova_github.Bea.Collector.Processor/*.csproj ./dnaborshchikova_github.Bea.Collector.Processor/
 COPY dnaborshchikova_github.Bea.Collector.Sender/*.csproj ./dnaborshchikova_github.Bea.Collector.Sender/
+COPY dnaborshchikova_github.Bea.Collector.Common/*.csproj ./dnaborshchikova_github.Bea.Collector.Common/
 
 RUN dotnet restore ./dnaborshchikova_github.Bea.Collector.WorkerService/dnaborshchikova_github.Bea.Collector.WorkerService.csproj
 

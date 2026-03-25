@@ -1,8 +1,10 @@
+using dnaborshchikova_github.Bea.Collector.Common;
 using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using dnaborshchikova_github.Bea.Collector.Core.Services;
 using dnaborshchikova_github.Bea.Collector.DataAccess;
-using dnaborshchikova_github.Bea.Collector.DataAccess.DbContext;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Initializers;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Initializers.Interfaces;
 using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories;
 using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
@@ -13,7 +15,6 @@ using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
 using dnaborshchikova_github.Bea.Collector.WorkerService.Models;
 using dnaborshchikova_github.Bea.Collector.WorkerService.Services;
 using dnaborshchikova_github.Bea.Collector.WorkerService.Validators;
-using dnaborshchikova_github.Bea.Collector.Common;
 using dnaborshchikova_github.Bea.Generator;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -63,7 +64,15 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddSingleton(appSettings);
         services.AddSingleton(generatorSettings);
 
-        services.AddScoped<DatabaseInitializer>();
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+        {
+            services.AddScoped<IDatabaseInitializer, DevelopmentDatabaseInitializer>();
+        }
+        else
+        {
+            services.AddScoped<IDatabaseInitializer, ProductionDatabaseInitializer>();
+        }
+
         services.AddScoped<ThreadProcessor>();
         services.AddScoped<TaskProcessor>();
 

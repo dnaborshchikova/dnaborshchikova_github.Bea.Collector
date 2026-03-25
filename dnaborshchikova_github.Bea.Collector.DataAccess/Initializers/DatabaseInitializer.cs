@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace dnaborshchikova_github.Bea.Collector.DataAccess.DbContext
+namespace dnaborshchikova_github.Bea.Collector.DataAccess.Initializers
 {
     public class DatabaseInitializer
     {
