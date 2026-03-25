@@ -99,8 +99,8 @@ var host = Host.CreateDefaultBuilder()
 using (var scope = host.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
-    var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
-    databaseInitializer.CreateDatabase();
+    var databaseInitializer = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
+    databaseInitializer.Initialize();
 }
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
