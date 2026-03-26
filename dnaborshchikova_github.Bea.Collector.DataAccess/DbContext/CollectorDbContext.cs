@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace dnaborshchikova_github.Bea.Collector.DataAccess
 {
-    public class CollectorDbContext : Microsoft.EntityFrameworkCore.DbContext
+    public class CollectorDbContext : DbContext
     {
-        public CollectorDbContext(DbContextOptions options) 
+        public CollectorDbContext(DbContextOptions<CollectorDbContext> options) 
             : base(options)
         {
         }
