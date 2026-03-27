@@ -33,7 +33,7 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
         [InlineData(1, "Task")]
         [InlineData(2, "Task")]
         [InlineData(4, "Task")]
-        public void Process_ValidBillEvents_CallsParserAndProcessorOnce(int threadCount, string processType)
+        public async Task Process_ValidBillEvents_CallsParserAndProcessorOnce(int threadCount, string processType)
         {
             //Arrange
             var generatorSettings = GeneratorSettingsBuilder.Default()
@@ -62,12 +62,24 @@ namespace dnaborshchikova_github.Bea.Collector.Tests.Processor
             var processorFactoryMock = new Mock<Func<string, IProcessor>>();
             processorFactoryMock.Setup(f => f(processType)).Returns(processorMock.Object);
 
-            var service = CreateSut(processorFactoryMock.Object, parserMock.Object, appSettings, logger);
+            var fileSelectionStrategyMock = new Mock<IFileSelectionStrategy>();
+            fileSelectionStrategyMock
+                .Setup(f => f.GetFiles())
+                .Returns(new List<string> { appSettings.ProcessingSettings.FilePath });
+
+            var sendLogRepositoryMock = new Mock<ISendEventLogRepository>();
+            sendLogRepositoryMock
+                .Setup(r => r.SaveSendResultAsync(It.IsAny<SendEventLog>()))
+                .Returns(Task.CompletedTask);
+
+            var service = CreateSut(processorFactoryMock.Object, parserMock.Object
+                , appSettings, logger, fileSelectionStrategyMock.Object, sendLogRepositoryMock.Object);
 
             //Act
-            service.ProcessAsync();
+            await service.ProcessAsync();
 
             //Assert
+            fileSelectionStrategyMock.Verify(f => f.GetFiles(), Times.Once);
             parserMock.Verify(p => p.Parse(appSettings.ProcessingSettings.FilePath), Times.Once);
             processorFactoryMock.Verify(f => f(appSettings.ProcessingSettings.ProcessType), Times.Once);
             processorMock.Verify(p => p.ProcessAsync(It.IsAny<List<EventProcessRange>>()), Times.Once);
