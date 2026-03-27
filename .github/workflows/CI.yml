@@ -32,10 +32,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore dnaborshchikova_github.Bea.Collector.sln
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build dnaborshchikova_github.Bea.Collector.sln --configuration Release
 
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test dnaborshchikova_github.Bea.Collector.Tests --no-build --configuration Release --verbosity normal
