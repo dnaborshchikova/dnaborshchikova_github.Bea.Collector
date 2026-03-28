@@ -7,6 +7,7 @@ namespace dnaborshchikova_github.Bea.Generator.Validators
     {
         public override void ValidateProcessingSettings(ProcessingSettings processingSettings)
         {
+            //TODO: заменить SettingsValidatorBase на интерфейс с реализацией?
         }
     }
 }
