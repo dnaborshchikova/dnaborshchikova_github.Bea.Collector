@@ -41,6 +41,9 @@ namespace dnaborshchikova_github.Bea.Generator.FileGeneration
                         if (value is decimal decimalValue)
                             return decimalValue.ToString(CultureInfo.InvariantCulture);
 
+                        if (value is DateTime dateTimeValue)
+                            return dateTimeValue.ToString("dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture);
+
                         return value.ToString();
                     });
 
