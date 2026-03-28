@@ -24,10 +24,8 @@ namespace dnaborshchikova_github.Bea.Collector.WorkerService.Services
             }
             finally
             {
-                // Чистое завершение хоста
                 _appLifetime.StopApplication();
             }
-
         }
     }
 }
