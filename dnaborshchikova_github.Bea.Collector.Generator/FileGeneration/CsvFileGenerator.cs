@@ -8,8 +8,8 @@ namespace dnaborshchikova_github.Bea.Generator.FileGeneration
     {
         public string GenerateFile(List<BillEvent> billEvents, string folderPath)
         {
-            var fileName = $"{DateTime.Now.ToShortDateString()}_BillEvent.csv";
-            var filePath = Path.Combine(folderPath, fileName); //
+            var fileName = $"{DateTime.Now:dd.MM.yyyy}_BillEvent.csv";
+            var filePath = Path.Combine(folderPath, fileName);
 
             using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
             {
