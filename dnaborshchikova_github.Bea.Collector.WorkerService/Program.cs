@@ -122,7 +122,6 @@ var host = Host.CreateDefaultBuilder(args)
 
 using (var scope = host.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
     var databaseInitializer = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
     databaseInitializer.Initialize();
 }

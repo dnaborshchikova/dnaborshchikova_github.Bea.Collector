@@ -17,19 +17,25 @@ namespace dnaborshchikova_github.Bea.Collector.DataAccess.Initializers
 
         public void Initialize()
         {
-            try
+            for (int i = 0; i < 10; i++)
             {
-                _context.Database.EnsureDeleted();
-                _logger.LogInformation("Database deleted (dev).");
+                try
+                {
+                    _context.Database.EnsureDeleted();
+                    _logger.LogInformation("Database deleted (dev).");
 
-                _context.Database.EnsureCreated();
-                _logger.LogInformation("Database created with tables (dev).");
+                    _context.Database.EnsureCreated();
+                    _logger.LogInformation("Database created with tables (dev).");
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, $"Retry {i}: DB not ready");
+                    Thread.Sleep(3000);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error initializing development database.");
-                throw;
-            }
+
+            throw new Exception("Database not available");
         }
     }
 }
