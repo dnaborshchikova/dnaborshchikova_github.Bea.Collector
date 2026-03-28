@@ -20,11 +20,11 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Filters;
 
-var builder = Host.CreateApplicationBuilder(args);
-
-// Конфигурация
-builder.Configuration.AddEnvironmentVariables();
-var config = builder.Configuration;
+var config = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables()
+    .Build();
 
 // Чтение настроек из конфигурации
 var generatorSettingsSection = config.GetSection(nameof(GeneratorSettings));
@@ -52,10 +52,6 @@ Log.Logger = new LoggerConfiguration()
     .Filter.ByExcluding(Matching.FromSource("Microsoft.EntityFrameworkCore.Update"))
     .Filter.ByExcluding(Matching.FromSource("Microsoft.EntityFrameworkCore.ChangeTracking"))
     .CreateLogger();
-
-// Очистка и добавление провайдеров логирования
-builder.Logging.ClearProviders();
-builder.Logging.AddSerilog();
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -113,11 +109,7 @@ var host = Host.CreateDefaultBuilder(args)
         if (appSettings.ProcessingSettings.RunMode == "ScheduledService")
             services.AddHostedService<PeriodicHostedService>();
     })
-    .ConfigureLogging(logging =>
-    {
-        logging.ClearProviders();
-        logging.AddSerilog();
-    })
+    .UseSerilog()
     .Build();
 
 using (var scope = host.Services.CreateScope())

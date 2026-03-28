@@ -5,19 +5,29 @@ namespace dnaborshchikova_github.Bea.Collector.WorkerService.Services
     public class SingleRunHostedService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IHostApplicationLifetime _appLifetime;
 
-        public SingleRunHostedService(IServiceProvider serviceProvider)
+        public SingleRunHostedService(IServiceProvider serviceProvider
+            , IHostApplicationLifetime appLifetime)
         {
             _serviceProvider = serviceProvider;
+            _appLifetime = appLifetime;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using var scope = _serviceProvider.CreateScope();
-            var processor = scope.ServiceProvider.GetRequiredService<IEventProcessor>();
-            await processor.ProcessAsync();
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var processor = scope.ServiceProvider.GetRequiredService<IEventProcessor>();
+                await processor.ProcessAsync();
+            }
+            finally
+            {
+                // Чистое завершение хоста
+                _appLifetime.StopApplication();
+            }
 
-            Environment.Exit(0);
         }
     }
 }
