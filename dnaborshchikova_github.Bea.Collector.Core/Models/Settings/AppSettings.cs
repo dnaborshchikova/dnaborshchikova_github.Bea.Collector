@@ -16,9 +16,6 @@
                 ?? throw new ArgumentNullException(nameof(processingSettings));
             this.GeneratorSettings = generatorSettings
                 ?? throw new ArgumentNullException(nameof(generatorSettings));
-
-            generatorSettings.Validate();
-            processingSettings.Validate();
         }
     }
 }

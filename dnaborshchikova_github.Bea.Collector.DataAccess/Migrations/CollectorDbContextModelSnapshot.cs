@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using dnaborshchikova_github.Bea.Collector.Sender;
+using dnaborshchikova_github.Bea.Collector.DataAccess;
 
 #nullable disable
 
-namespace dnaborshchikova_github.Bea.Collector.Sender.Migrations
+namespace dnaborshchikova_github.Bea.Collector.DataAccess.Migrations
 {
     [DbContext(typeof(CollectorDbContext))]
     partial class CollectorDbContextModelSnapshot : ModelSnapshot
@@ -44,7 +44,34 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SendEvents", (string)null);
+                    b.ToTable("SendEvents");
+                });
+
+            modelBuilder.Entity("dnaborshchikova_github.Bea.Collector.Core.Models.SendEventLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsSendCompleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("RunDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RunSettings")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SendEventLogs");
                 });
 #pragma warning restore 612, 618
         }

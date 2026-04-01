@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace dnaborshchikova_github.Bea.Collector.Sender.DbContext
+namespace dnaborshchikova_github.Bea.Collector.DataAccess.Initializers
 {
     public class DatabaseInitializer
     {
@@ -15,14 +15,19 @@ namespace dnaborshchikova_github.Bea.Collector.Sender.DbContext
 
         public void CreateDatabase()
         {
-            if (_context.Database.CanConnect())
+            try
             {
                 _context.Database.EnsureDeleted();
                 _logger.LogInformation("Database deleted.");
-            }
 
-            _context.Database.EnsureCreated();
-            _logger.LogInformation("Database created.");
+                _context.Database.EnsureCreated();
+                _logger.LogInformation("Database created with tables.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating database.");
+                throw;
+            }
         }
     }
 }
