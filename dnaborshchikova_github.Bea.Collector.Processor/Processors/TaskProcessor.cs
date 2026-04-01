@@ -23,8 +23,6 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             {
                 try
                 {
-                    //if (range.Id == 2) //TODO: удалить перед завершением PR по BackgroundTask
-                    //    throw new Exception("Диапазон номер 2");
                     await _dbSender.SendAsync(range);
                 }
                 catch (Exception ex)
