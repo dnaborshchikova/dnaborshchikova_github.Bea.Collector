@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "dnaborshchikova_github.Bea.Collector.WorkerService": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

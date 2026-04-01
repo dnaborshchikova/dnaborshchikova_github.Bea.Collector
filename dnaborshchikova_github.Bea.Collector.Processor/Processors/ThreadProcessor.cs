@@ -1,5 +1,6 @@
 ﻿using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Core.Models;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
@@ -7,28 +8,27 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 {
     public class ThreadProcessor : IProcessor
     {
-        private readonly ICompositeEventSender _compositeEventSender;
+        private readonly IEventSender _dbSender;
         private readonly ILogger<ThreadProcessor> _logger;
 
-        public ThreadProcessor(ICompositeEventSender compositeEventSender
-            , ILogger<ThreadProcessor> logger)
+        public ThreadProcessor(ILogger<ThreadProcessor> logger, IEventSender dbSender)
         {
-            _compositeEventSender = compositeEventSender;
+            _dbSender = dbSender;
             _logger = logger;
         }
 
-        public async Task ProcessAsync(List<EventProcessRange> ranges)
+        public async Task<bool> ProcessAsync(List<EventProcessRange> ranges)
         {
             using var countdown = new CountdownEvent(ranges.Count);
             var exceptions = new ConcurrentQueue<(int rangeId, int threadId, Exception ex)>();
-
+            var isSendCompleted = true;
             foreach (var range in ranges)
             {
                 var thread = new Thread(() =>
                 {
                     try
                     {
-                        _compositeEventSender.Send(range);
+                        _dbSender.Send(range);
                     }
                     catch (Exception ex)
                     {
@@ -54,7 +54,10 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
                     _logger.LogError(ex, $"Подробная информация об ошибке в " +
                         $"ThreadId={Thread.CurrentThread.ManagedThreadId} при обработке RangeId={rangeId}");
                 }
+                isSendCompleted = false;
             }
+
+            return isSendCompleted;
         }
     }
 }

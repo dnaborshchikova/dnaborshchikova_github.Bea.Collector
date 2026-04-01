@@ -6,23 +6,22 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
 {
     public class ThreadProcessorWithLock : IProcessor
     {
-        private readonly ICompositeEventSender _compositeEventSender;
         private readonly ILogger<ThreadProcessor> _logger;
+        private readonly IEventSender _eventSender;
         private readonly object locker = new object();
         private int completedThreads;
 
-        public ThreadProcessorWithLock(ICompositeEventSender compositeEventSender
-            , ILogger<ThreadProcessor> logger)
+        public ThreadProcessorWithLock(ILogger<ThreadProcessor> logger, IEventSender eventSender)
         {
-            _compositeEventSender = compositeEventSender;
             _logger = logger;
+            _eventSender = eventSender;
         }
 
-        public async Task ProcessAsync(List<EventProcessRange> ranges)
+        public async Task<bool> ProcessAsync(List<EventProcessRange> ranges)
         {
             completedThreads = ranges.Count;
             var exceptions = new List<Exception>();
-
+            var isSendCompleted = true;
             foreach (var range in ranges)
             {
                 var thread = new Thread(() => ProcessRange(range, exceptions));
@@ -41,14 +40,17 @@ namespace dnaborshchikova_github.Bea.Collector.Processor.Processors
             {
                 _logger.LogInformation($"При обработке данных возникли ошибки:\n" +
                     $"{string.Join(";\n", exceptions)}");
+                isSendCompleted = false;
             }
+
+            return isSendCompleted;
         }
 
         private void ProcessRange(EventProcessRange range, List<Exception> exceptions)
         {
             try
             {
-                _compositeEventSender.Send(range);
+                _eventSender.Send(range);
             }
             catch (Exception ex)
             {

@@ -16,20 +16,6 @@
             FileFormat = fileFormat;
             PaidBillEventCount = paidBillEventCount;
             CancelledBillEventCount = cancelledBillEventCount;
-
-            Validate();
-        }
-
-        public void Validate()
-        {
-            if (string.IsNullOrEmpty(FileFormat))
-                throw new InvalidOperationException("Не указано значение параметра FileFormat.");
-
-            if (PaidBillEventCount <= 0)
-                throw new InvalidOperationException("Не указано значение параметра PaidBillEventCount.");
-
-            if (CancelledBillEventCount <= 0)
-                throw new InvalidOperationException("Не указано значение параметра CancelledBillEventCount.");
         }
     }
 }
