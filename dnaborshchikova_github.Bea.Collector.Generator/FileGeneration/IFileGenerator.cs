@@ -4,6 +4,6 @@ namespace dnaborshchikova_github.Bea.Generator.FileGeneration
 {
     public interface IFileGenerator
     {
-        public string GenerateFile(List<BillEvent> billEvents);
+        public string GenerateFile(List<BillEvent> billEvents, string folderPath);
     }
 }

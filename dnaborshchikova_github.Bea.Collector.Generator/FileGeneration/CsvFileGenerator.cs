@@ -6,10 +6,10 @@ namespace dnaborshchikova_github.Bea.Generator.FileGeneration
 {
     public class CsvFileGenerator : IFileGenerator
     {
-        public string GenerateFile(List<BillEvent> billEvents)
+        public string GenerateFile(List<BillEvent> billEvents, string folderPath)
         {
-            var fileName = $"{DateTime.Now.ToShortDateString()}_BillEvent.csv";
-            var filePath = Path.Combine(AppContext.BaseDirectory, fileName);
+            var fileName = $"{DateTime.Now:dd.MM.yyyy}_BillEvent.csv";
+            var filePath = Path.Combine(folderPath, fileName);
 
             using (var writer = new StreamWriter(filePath, false, Encoding.UTF8))
             {
@@ -40,6 +40,9 @@ namespace dnaborshchikova_github.Bea.Generator.FileGeneration
 
                         if (value is decimal decimalValue)
                             return decimalValue.ToString(CultureInfo.InvariantCulture);
+
+                        if (value is DateTime dateTimeValue)
+                            return dateTimeValue.ToString("dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture);
 
                         return value.ToString();
                     });

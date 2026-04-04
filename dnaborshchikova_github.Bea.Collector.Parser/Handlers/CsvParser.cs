@@ -43,7 +43,7 @@ namespace dnaborshchikova_github.Bea.Collector.Parser.Handlers
         {
             var stringParts = line.Split(',');
             var operationId = Guid.Parse(stringParts[0]);
-            var operationDate = DateTime.Parse(stringParts[1]);
+            var operationDate = DateTime.ParseExact(stringParts[1], "dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture);
             var userId = Guid.Parse(stringParts[2]);
             var eventType = stringParts[3];
             var amount = Decimal.Parse(stringParts[4], CultureInfo.InvariantCulture);

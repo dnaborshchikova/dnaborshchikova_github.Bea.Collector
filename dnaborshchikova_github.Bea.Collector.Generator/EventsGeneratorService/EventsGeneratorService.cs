@@ -18,12 +18,14 @@ namespace dnaborshchikova_github.Bea.Generator.EventsGeneratorService
             _fileGeneratorFactory = fileGeneratorFactory;
         }
 
-        public string GenerateEvents()
+        public string GenerateEvents(string folderPath)
         {
             var events = _dataGenerator.GenerateEvents(_generatorSettings.PaidBillEventCount
                 , _generatorSettings.CancelledBillEventCount);
             var fileGenerator = _fileGeneratorFactory(_generatorSettings.FileFormat);
-            var filePath = fileGenerator.GenerateFile(events);
+
+
+            var filePath = fileGenerator.GenerateFile(events, folderPath);
 
             return filePath;
         }

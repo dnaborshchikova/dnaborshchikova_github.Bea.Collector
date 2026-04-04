@@ -1,11 +1,19 @@
-﻿using dnaborshchikova_github.Bea.Collector.App;
+﻿using dnaborshchikova_github.Bea.Collector.App.Validators;
+using dnaborshchikova_github.Bea.Collector.Common;
 using dnaborshchikova_github.Bea.Collector.Core.Interfaces;
+using dnaborshchikova_github.Bea.Collector.Core.Models.Settings;
+using dnaborshchikova_github.Bea.Collector.Core.Services;
+using dnaborshchikova_github.Bea.Collector.DataAccess;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Initializers;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Initializers.Interfaces;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories;
+using dnaborshchikova_github.Bea.Collector.DataAccess.Repositories.Interfaces;
 using dnaborshchikova_github.Bea.Collector.Parser.Handlers;
+using dnaborshchikova_github.Bea.Collector.Processor.Handlers;
 using dnaborshchikova_github.Bea.Collector.Processor.Processors;
 using dnaborshchikova_github.Bea.Collector.Processor.Services;
-using dnaborshchikova_github.Bea.Collector.Sender;
-using dnaborshchikova_github.Bea.Collector.Sender.DbContext;
 using dnaborshchikova_github.Bea.Collector.Sender.Handlers;
+using dnaborshchikova_github.Bea.Collector.Sender.Senders;
 using dnaborshchikova_github.Bea.Generator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,8 +27,20 @@ using System.Diagnostics;
 var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
-var validator = new AppSettingsService(config);
-var appSettings = validator.CreateAppSettings();
+
+var generatorSettingsSection = config.GetSection(nameof(GeneratorSettings));
+config.GetRequired<GeneratorSettings>("GeneratorSettings", "PaidBillEventCount", "CancelledBillEventCount");
+var generatorSettings = generatorSettingsSection.Get<GeneratorSettings>();
+
+var processingSettingsSection = config.GetSection(nameof(ProcessingSettings));
+config.GetRequired<ProcessingSettings>("ProcessingSettings", "ThreadCount");
+var processingSettings = processingSettingsSection.Get<ProcessingSettings>();
+
+var appSettingsValidator = new AppSettingsValidator();
+appSettingsValidator.Validate(generatorSettings, processingSettings);
+
+var appSettingsService = new AppSettingsService();
+var appSettings = appSettingsService.CreateAppSettings(generatorSettings, processingSettings);
 
 #region Запуск генератора
 RunGenerator();
@@ -40,25 +60,32 @@ var host = Host.CreateDefaultBuilder()
      })
     .ConfigureServices(services =>
     {
-        services.AddSingleton(appSettings);
-        services.AddScoped<DatabaseInitializer>();
-        services.AddScoped<ThreadProcessorWithLock>();
+        services.AddSingleton(appSettings); 
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+        {
+            services.AddScoped<IDatabaseInitializer, DevelopmentDatabaseInitializer>();
+        }
+        else
+        {
+            services.AddScoped<IDatabaseInitializer, ProductionDatabaseInitializer>();
+        }
         services.AddScoped<ThreadProcessor>();
         services.AddScoped<TaskProcessor>();
         services.AddScoped<Func<string, IProcessor>>(provider => key =>
         {
             return key switch
             {
-                //"Thread" => provider.GetRequiredService<ThreadProcessorWithLock>(),
                 "Thread" => provider.GetRequiredService<ThreadProcessor>(),
-                "Task" => provider.GetRequiredService<TaskProcessor>()
+                "Task" => provider.GetRequiredService<TaskProcessor>(),
+                "ThreadProcessorWithLock" => provider.GetRequiredService<ThreadProcessorWithLock>(),
             };
         });
-        //services.AddScoped<IEventSender, MessageQueueSender>();
+        services.AddScoped<IEventSender, MessageQueueSender>();
         services.AddScoped<IEventSender, DataBaseSender>();
-        services.AddScoped<ICompositeEventSender, CompositeEventSender>();
         services.AddScoped<IParser, CsvParser>();
+        services.AddScoped<ISendEventLogRepository, SendEventLogRepository>();
         services.AddScoped<IEventProcessor, EventProcessorService>();
+        services.AddScoped<IFileSelectionStrategy, ConsoleFileSelectionStrategy>();
         services.AddDbContextFactory<CollectorDbContext>(options =>
         {
             options.UseNpgsql(config.GetConnectionString("Default"));
@@ -72,13 +99,12 @@ var host = Host.CreateDefaultBuilder()
 using (var scope = host.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CollectorDbContext>();
-    var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
-    databaseInitializer.CreateDatabase();
+    var databaseInitializer = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
+    databaseInitializer.Initialize();
 }
 
 var eventProcessor = host.Services.GetService<IEventProcessor>();
-eventProcessor.ProcessAsync();
-Console.ReadLine();
+await eventProcessor.ProcessAsync();
 
 void RunGenerator()
 {
@@ -111,6 +137,7 @@ void RunGenerator()
     else if (appSettings.ProcessingSettings.GenerateFile)
     {
         var runner = new AppRunner(appSettings.GeneratorSettings);
-        appSettings.ProcessingSettings.FilePath = runner.Generate();
+        var folderPath = AppContext.BaseDirectory;
+        appSettings.ProcessingSettings.FilePath = runner.Generate(folderPath);
     }
 }

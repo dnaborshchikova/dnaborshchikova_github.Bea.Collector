@@ -34,11 +34,11 @@ namespace dnaborshchikova_github.Bea.Generator
                      .Build();
         }
 
-        public string Generate()
+        public string Generate(string folderPath)
         {
             using var scope = _host.Services.CreateScope();
             var eventsGeneratorService = scope.ServiceProvider.GetRequiredService<IEventsGeneratorService>();
-            var filepath = eventsGeneratorService.GenerateEvents();
+            var filepath = eventsGeneratorService.GenerateEvents(folderPath);
 
             return filepath;
         }

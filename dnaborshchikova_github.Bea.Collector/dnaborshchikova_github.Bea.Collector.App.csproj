@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -13,7 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Common\dnaborshchikova_github.Bea.Collector.Common.csproj" />
     <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Core\dnaborshchikova_github.Bea.Collector.Core.csproj" />
+    <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.DataAccess\dnaborshchikova_github.Bea.Collector.DataAccess.csproj" />
     <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Generator\dnaborshchikova_github.Bea.Generator.csproj" />
     <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Parser\dnaborshchikova_github.Bea.Collector.Parser.csproj" />
     <ProjectReference Include="..\dnaborshchikova_github.Bea.Collector.Processor\dnaborshchikova_github.Bea.Collector.Processor.csproj" />
